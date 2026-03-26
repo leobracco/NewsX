@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/ads.css">
 </head>
 <body>
 
@@ -41,11 +42,24 @@
   <div class="grid-inner">
     <% if (!news || news.length === 0) { %>
       <div class="empty-state">
-  <div class="empty-icon">🌾</div>
-  <h2>Sin noticias aún</h2>
-  <% if (search || currentCat) { %><a href="/" class="btn-primary">Ver todas</a><% } %>
-</div>
+        <div class="empty-icon">🌾</div>
+        <h2>Sin noticias aún</h2>
+        <% if (search || currentCat) { %><a href="/" class="btn-primary">Ver todas</a><% } %>
+      </div>
     <% } else { %>
+
+      <%
+        // Definir qué banners mostrar y en qué posición
+        const adSlots = [
+          { afterIndex: 1, variant: 'piloto' },    // después de la 2da noticia
+          { afterIndex: 4, variant: 'sxs' },        // después de la 5ta
+          { afterIndex: 6, variant: 'finance' },     // después de la 7ma
+          { afterIndex: 8, variant: 'rtk' },         // después de la 9na
+        ];
+        const adMap = {};
+        adSlots.forEach(s => { adMap[s.afterIndex] = s.variant; });
+      %>
+
       <% news.forEach((item, i) => { %>
         <article class="news-card <%= i===0 && !currentCat && !search && page===1 ? 'featured' : '' %>">
           <div class="card-cat">
@@ -68,13 +82,25 @@
             <div class="card-actions">
               <a href="/noticia/<%= item.slug %>" class="btn-read">Leer más →</a>
               <div class="share-btns">
-                <a href="https://wa.me/?text=<%= encodeURIComponent((item.web?.title||'') + ' https://blog.agroparallel.com/noticia/' + item.slug) %>" target="_blank" class="share-btn">🟢</a>
-                <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent('https://blog.agroparallel.com/noticia/'+item.slug) %>" target="_blank" class="share-btn">📘</a>
+                <a href="https://wa.me/?text=<%= encodeURIComponent((item.web?.title||'') + ' https://news.agroparallel.com/noticia/' + item.slug) %>" target="_blank" class="share-btn">🟢</a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent('https://news.agroparallel.com/noticia/'+item.slug) %>" target="_blank" class="share-btn">📘</a>
               </div>
             </div>
           </div>
         </article>
+
+        <% // Insertar banner después de esta noticia si corresponde %>
+        <% if (adMap[i]) { %>
+          <%- include('_ad_banner', { variant: adMap[i] }) %>
+        <% } %>
+
       <% }) %>
+
+      <%# Banner de marca al final si hay suficientes noticias %>
+      <% if (news.length >= 3) { %>
+        <%- include('_ad_banner', { variant: 'brand' }) %>
+      <% } %>
+
     <% } %>
   </div>
 </section>

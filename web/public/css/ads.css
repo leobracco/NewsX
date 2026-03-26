@@ -1,0 +1,346 @@
+/* ================================================================
+   AGRO PARALLEL — ads.css
+   Banners publicitarios de productos
+   Intercalados entre noticias en el grid
+================================================================ */
+
+/* ── BANNER BASE ─────────────────────────────── */
+.ad-banner {
+  grid-column: 1 / -1;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: transform .3s, box-shadow .3s;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.ad-banner:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(109,194,49,.18);
+}
+
+/* ── VARIANTE HERO (ancho completo, alto impacto) ── */
+.ad-hero {
+  background: linear-gradient(135deg, #1A1C26 0%, #3D4257 50%, #1A1C26 100%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 220px;
+  border: 1px solid rgba(109,194,49,.15);
+}
+.ad-hero::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background: #6DC231;
+  z-index: 2;
+}
+.ad-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(109,194,49,.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+.ad-hero-content {
+  padding: 32px 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+.ad-hero-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  padding: 24px;
+}
+
+.ad-tag {
+  display: inline-block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: .68rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #1A1C26;
+  background: #6DC231;
+  padding: 4px 14px;
+  border-radius: 4px;
+  margin-bottom: 14px;
+  width: fit-content;
+}
+
+.ad-product-name {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  letter-spacing: .5px;
+  margin-bottom: 10px;
+}
+.ad-product-name em {
+  color: #6DC231;
+  font-style: normal;
+}
+
+.ad-product-desc {
+  font-family: 'Lora', serif;
+  font-size: .85rem;
+  color: #A0A8C0;
+  line-height: 1.55;
+  margin-bottom: 16px;
+  max-width: 400px;
+}
+
+.ad-price-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ad-price {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #6DC231;
+  letter-spacing: 1px;
+}
+.ad-price-detail {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: .75rem;
+  color: #A0A8C0;
+  letter-spacing: .5px;
+}
+
+.ad-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 10px 22px;
+  background: #6DC231;
+  color: #1A1C26;
+  border-radius: 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: .85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: background .2s;
+  width: fit-content;
+}
+.ad-banner:hover .ad-cta-btn {
+  background: #82dc3a;
+}
+
+.ad-product-code {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  font-weight: 900;
+  color: #6DC231;
+  opacity: .07;
+  line-height: 1;
+  text-align: center;
+  user-select: none;
+}
+.ad-product-icon {
+  font-size: 3.5rem;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.ad-brand-watermark {
+  position: absolute;
+  bottom: 14px;
+  right: 20px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.12);
+  z-index: 1;
+}
+.ad-brand-watermark span { color: rgba(109,194,49,.2); }
+
+/* ── VARIANTE COMPACT (mitad del grid) ────────── */
+.ad-compact {
+  background: linear-gradient(160deg, #3D4257 0%, #1A1C26 100%);
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 200px;
+  border: 1px solid rgba(109,194,49,.12);
+  grid-column: span 1;
+}
+.ad-compact::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #6DC231, transparent);
+}
+.ad-compact .ad-product-name {
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+}
+.ad-compact .ad-product-desc {
+  font-size: .82rem;
+  margin-bottom: 12px;
+}
+.ad-compact .ad-price {
+  font-size: 1.3rem;
+}
+.ad-compact .ad-cta-btn {
+  padding: 8px 18px;
+  font-size: .8rem;
+  margin-top: 12px;
+}
+
+/* ── VARIANTE STRIP (barra horizontal) ────────── */
+.ad-strip {
+  background: #1A1C26;
+  border: 1px solid rgba(109,194,49,.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  gap: 20px;
+  min-height: auto;
+}
+.ad-strip::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: #6DC231;
+}
+.ad-strip-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+.ad-strip-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+.ad-strip .ad-product-name {
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+.ad-strip .ad-product-desc {
+  font-size: .78rem;
+  margin-bottom: 0;
+  max-width: 320px;
+}
+.ad-strip .ad-cta-btn {
+  margin-top: 0;
+  padding: 8px 18px;
+  font-size: .78rem;
+  white-space: nowrap;
+}
+
+/* ── VARIANTE FINANCE (banner verde marca) ──── */
+.ad-finance {
+  background: linear-gradient(135deg, #4A8F1F 0%, #6DC231 55%, #3D7A15 100%);
+  padding: 36px 40px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+.ad-finance-hex {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(60deg, rgba(26,28,38,.05) 0px, rgba(26,28,38,.05) 1px, transparent 1px, transparent 28px),
+    repeating-linear-gradient(120deg, rgba(26,28,38,.05) 0px, rgba(26,28,38,.05) 1px, transparent 1px, transparent 28px);
+}
+.ad-finance-brand {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #3D4257;
+  position: relative;
+  z-index: 1;
+}
+.ad-finance-brand span {
+  color: #1A1C26;
+  opacity: .6;
+}
+.ad-finance-text {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(.82rem, 1.5vw, .95rem);
+  font-weight: 600;
+  color: #3D4257;
+  margin: 14px 0;
+  line-height: 1.5;
+  max-width: 500px;
+  position: relative;
+  z-index: 1;
+}
+.ad-finance-items {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 18px;
+  position: relative;
+  z-index: 1;
+}
+.ad-finance-items span {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: .78rem;
+  font-weight: 700;
+  color: #1A1C26;
+  background: rgba(255,255,255,.2);
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: .5px;
+}
+.ad-finance .ad-cta-btn {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 900px) {
+  .ad-hero {
+    grid-template-columns: 1fr;
+  }
+  .ad-hero-visual {
+    display: none;
+  }
+  .ad-strip {
+    flex-direction: column;
+    text-align: center;
+    gap: 14px;
+  }
+  .ad-strip-left {
+    flex-direction: column;
+    text-align: center;
+  }
+  .ad-strip .ad-product-desc {
+    max-width: 100%;
+  }
+  .ad-finance-items {
+    gap: 8px;
+  }
+  .ad-finance-items span {
+    font-size: .72rem;
+    padding: 3px 10px;
+  }
+}

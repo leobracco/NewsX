@@ -1,0 +1,98 @@
+<%# 
+  Banners publicitarios de productos Agro Parallel
+  Se intercalan entre las noticias en index.ejs
+  Uso: <%- include('_ad_banner', { variant: 'piloto' }) %>
+%>
+
+<% if (variant === 'piloto') { %>
+<!-- BANNER: Piloto Automático AGP-AU -->
+<a href="https://agroparallel.com/producto/AGP-AU" target="_blank" rel="noopener" class="ad-banner ad-hero">
+  <div class="ad-hero-content">
+    <div class="ad-tag">Producto destacado</div>
+    <div class="ad-product-name">Piloto Automático <em>AGP-AU</em></div>
+    <div class="ad-product-desc">Sistema eléctrico con señal libre. Instalación simple en tractores, pulverizadoras y cosechadoras de todas las marcas.</div>
+    <div class="ad-price-row">
+      <span class="ad-price">USD 8.751</span>
+      <span class="ad-price-detail">Envío gratis · Financiación</span>
+    </div>
+    <div class="ad-cta-btn">Ver producto →</div>
+  </div>
+  <div class="ad-hero-visual">
+    <div>
+      <div class="ad-product-icon">🛰️</div>
+      <div class="ad-product-code">AGP-AU</div>
+    </div>
+  </div>
+  <div class="ad-brand-watermark">AGRO <span>PARALLEL</span></div>
+</a>
+
+<% } else if (variant === 'rtk') { %>
+<!-- BANNER: Base RTK AGP-RTK -->
+<a href="https://agroparallel.com/producto/AGP-RTK" target="_blank" rel="noopener" class="ad-banner ad-compact">
+  <div class="ad-tag">Precisión centimétrica</div>
+  <div class="ad-product-name">Base RTK <em>AGP-RTK</em></div>
+  <div class="ad-product-desc">Corrección RTK para máxima precisión en guía satelital. Complemento ideal del piloto automático.</div>
+  <div class="ad-price-row">
+    <span class="ad-price">USD 5.746</span>
+    <span class="ad-price-detail">Envío gratis</span>
+  </div>
+  <div class="ad-cta-btn">Consultar →</div>
+  <div class="ad-brand-watermark">AGRO <span>PARALLEL</span></div>
+</a>
+
+<% } else if (variant === 'sxs') { %>
+<!-- BANNER: Corte Surco por Surco AGP-SXS -->
+<a href="https://agroparallel.com/producto/AGP-SXS" target="_blank" rel="noopener" class="ad-banner ad-compact">
+  <div class="ad-tag">Siembra de precisión</div>
+  <div class="ad-product-name">Corte Surco x Surco <em>AGP-SXS</em></div>
+  <div class="ad-product-desc">Eliminá la superposición de semillas. Corte individual por surco para sembradoras neumáticas.</div>
+  <div class="ad-price-row">
+    <span class="ad-price">USD 5.201</span>
+    <span class="ad-price-detail">Envío gratis</span>
+  </div>
+  <div class="ad-cta-btn">Ver más →</div>
+  <div class="ad-brand-watermark">AGRO <span>PARALLEL</span></div>
+</a>
+
+<% } else if (variant === 'vr') { %>
+<!-- BANNER: Dosis Variable AGP-VR -->
+<a href="https://agroparallel.com/producto/AGP-VR" target="_blank" rel="noopener" class="ad-banner ad-compact">
+  <div class="ad-tag">Optimizá insumos</div>
+  <div class="ad-product-name">Dosis Variable <em>AGP-VR</em></div>
+  <div class="ad-product-desc">Ajuste en tiempo real según mapas de prescripción. Ahorrá semillas y fertilizantes en cada lote.</div>
+  <div class="ad-price-row">
+    <span class="ad-price">USD 5.350</span>
+    <span class="ad-price-detail">Envío gratis</span>
+  </div>
+  <div class="ad-cta-btn">Consultar →</div>
+  <div class="ad-brand-watermark">AGRO <span>PARALLEL</span></div>
+</a>
+
+<% } else if (variant === 'finance') { %>
+<!-- BANNER: Financiación general -->
+<a href="https://agroparallel.com" target="_blank" rel="noopener" class="ad-banner ad-strip">
+  <div class="ad-strip-left">
+    <div class="ad-strip-icon">🌾</div>
+    <div>
+      <div class="ad-product-name">Tecnología al alcance de <em>todos</em></div>
+      <div class="ad-product-desc">Agricultura de precisión con financiación a medida · Envío gratis en todos los productos</div>
+    </div>
+  </div>
+  <div class="ad-cta-btn">Conocé nuestros productos →</div>
+</a>
+
+<% } else if (variant === 'brand') { %>
+<!-- BANNER: Marca / institucional -->
+<a href="https://agroparallel.com" target="_blank" rel="noopener" class="ad-banner ad-finance">
+  <div class="ad-finance-hex"></div>
+  <div class="ad-finance-brand">AGRO <span>PARALLEL</span></div>
+  <div class="ad-finance-text">Soluciones de agricultura de precisión desde San Antonio de Areco para todo el campo argentino</div>
+  <div class="ad-finance-items">
+    <span>🛰️ Piloto Automático</span>
+    <span>📡 Base RTK</span>
+    <span>🌱 Corte Surco x Surco</span>
+    <span>⚙️ Dosis Variable</span>
+  </div>
+  <div class="ad-cta-btn" style="background:#fff;color:#1A1C26">Visitar tienda →</div>
+</a>
+<% } %>
