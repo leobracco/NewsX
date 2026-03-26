@@ -41,11 +41,10 @@
   <div class="grid-inner">
     <% if (!news || news.length === 0) { %>
       <div class="empty-state">
-        <div class="empty-icon">🌾</div>
-        <h2>Sin noticias aún</h2>
-        <p>Ejecutá <code>node src/scheduler.js --run-now</code> para generar el primer contenido.</p>
-        <% if (search || currentCat) { %><a href="/" class="btn-primary">Ver todas</a><% } %>
-      </div>
+  <div class="empty-icon">🌾</div>
+  <h2>Sin noticias aún</h2>
+  <% if (search || currentCat) { %><a href="/" class="btn-primary">Ver todas</a><% } %>
+</div>
     <% } else { %>
       <% news.forEach((item, i) => { %>
         <article class="news-card <%= i===0 && !currentCat && !search && page===1 ? 'featured' : '' %>">
