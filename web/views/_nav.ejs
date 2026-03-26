@@ -1,0 +1,30 @@
+<header class="nav">
+  <div class="nav-inner">
+    <a href="/" class="logo">AGRO <span>PARALLEL</span></a>
+    <nav class="nav-links">
+      <a href="/?categoria=Tecnolog%C3%ADa">Tecnología</a>
+      <a href="/?categoria=Mercados">Mercados</a>
+      <a href="/?categoria=Cultivos">Cultivos</a>
+      <a href="/?categoria=Ganadería">Ganadería</a>
+      <a href="/?categoria=Maquinaria">Maquinaria</a>
+    </nav>
+    <div class="nav-search">
+      <form action="/" method="get">
+        <input type="text" name="q" placeholder="Buscar noticias…" value="<%= typeof search !== 'undefined' && search ? search : '' %>">
+        <button type="submit">⌕</button>
+      </form>
+    </div>
+    <button class="nav-burger" onclick="toggleMenu()">☰</button>
+  </div>
+  <div class="nav-mobile" id="navMobile">
+    <a href="/?categoria=Tecnolog%C3%ADa">Tecnología</a>
+    <a href="/?categoria=Mercados">Mercados</a>
+    <a href="/?categoria=Cultivos">Cultivos</a>
+    <a href="/?categoria=Ganadería">Ganadería</a>
+    <a href="/?categoria=Maquinaria">Maquinaria</a>
+    <a href="/?categoria=Sostenibilidad">Sostenibilidad</a>
+    <form action="/" method="get" style="margin-top:16px">
+      <input type="text" name="q" placeholder="Buscar…" class="mobile-search">
+    </form>
+  </div>
+</header>

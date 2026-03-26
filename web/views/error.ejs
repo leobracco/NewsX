@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error · Agro Parallel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<%- include('_nav', { search: null }) %>
+<div style="text-align:center; padding:80px 24px;">
+  <div style="font-size:4rem;margin-bottom:20px">⚠️</div>
+  <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:2.5rem;color:#3D4257;margin-bottom:12px"><%= message||'Error' %></h1>
+  <p style="color:#A0A8C0;margin-bottom:28px">Algo salió mal. Intentá de nuevo más tarde.</p>
+  <a href="/" class="btn-primary">← Volver al inicio</a>
+</div>
+<%- include('_footer') %>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agro Parallel — Preview Carrusel</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #12141E;
+  font-family: Arial, sans-serif;
+  color: #fff;
+  min-height: 100vh;
+  padding: 40px 20px;
+}
+
+h1 {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-align: center;
+  margin-bottom: 6px;
+}
+h1 span { color: #6DC231; }
+.sub { text-align:center; color:#A0A8C0; font-size:.85rem; letter-spacing:2px; margin-bottom:40px; }
+
+.tabs { display:flex; justify-content:center; gap:12px; margin-bottom:36px; flex-wrap:wrap; }
+.tab {
+  padding: 7px 20px;
+  border: 2px solid #3D4257;
+  border-radius: 40px;
+  cursor: pointer;
+  font-size: .8rem;
+  font-weight: 700;
+  color: #A0A8C0;
+  letter-spacing: 1px;
+  transition: all .2s;
+}
+.tab.active { border-color:#6DC231; color:#6DC231; background:rgba(109,194,49,.08); }
+
+.viewer { display:flex; align-items:center; justify-content:center; gap:24px; margin-bottom:24px; }
+.nav { width:46px; height:46px; border-radius:50%; border:2px solid #3D4257; background:none; color:#fff; font-size:1.1rem; cursor:pointer; transition:all .2s; }
+.nav:hover { border-color:#6DC231; color:#6DC231; }
+
+.counter { text-align:center; font-size:.78rem; color:#A0A8C0; letter-spacing:2px; margin-bottom:8px; }
+
+/* ── wrapper ─────────────────────────────────── */
+.wrap { position:relative; border-radius:14px; overflow:hidden; box-shadow:0 20px 70px rgba(0,0,0,.6); }
+
+/* ── formatos ────────────────────────────────── */
+.fmt-square    .slide { width:480px; height:480px; }
+.fmt-vertical  .slide { width:432px; height:540px; }
+.fmt-horizontal .slide { width:640px; height:360px; }
+.fmt-story     .slide { width:270px; height:480px; }
+
+/* ── slide base ──────────────────────────────── */
+.slide { display:none; position:relative; overflow:hidden; flex-direction:column; }
+.slide.active { display:flex; }
+
+/* ── barra verde izquierda ───────────────────── */
+.slide::before { content:''; position:absolute; left:0; top:0; bottom:0; width:7px; background:#6DC231; z-index:5; }
+
+/* ── patrón de puntos ────────────────────────── */
+.dots::after {
+  content:'';
+  position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(109,194,49,.1) 1px, transparent 1px);
+  background-size: 34px 34px;
+  pointer-events:none;
+}
+
+/* ── SLIDE TÍTULO ────────────────────────────── */
+.s-title { background:#3D4257; padding:36px 44px 36px 52px; justify-content:space-between; }
+.s-title .cat {
+  display:inline-block; background:#6DC231; color:#1A1C26;
+  font-size:.68rem; font-weight:900; letter-spacing:2px;
+  padding:6px 16px; border-radius:6px; text-transform:uppercase; margin-bottom:20px;
+}
+.s-title .title {
+  font-size: clamp(1.5rem, 4.5vw, 2.3rem);
+  font-weight: 900; line-height:1.12; color:#fff; flex:1;
+}
+.s-title .src-wrap { margin-top:20px; }
+.s-title .src-wrap::before { content:''; display:block; width:60px; height:4px; background:#6DC231; border-radius:2px; margin-bottom:10px; }
+.s-title .src { font-size:.72rem; color:#A0A8C0; }
+.brand-tr { position:absolute; bottom:24px; right:32px; font-size:.9rem; font-weight:900; letter-spacing:2px; }
+.brand-tr span { color:#6DC231; }
+
+/* ── SLIDE DATO ──────────────────────────────── */
+.s-data { padding:32px 40px 32px 52px; justify-content:center; }
+.s-data.even { background:#1A1C26; }
+.s-data.odd  { background:#3D4257; }
+.bg-num {
+  position:absolute; right:10px; top:50%; transform:translateY(-50%);
+  font-size:clamp(5rem,16vw,10rem); font-weight:900;
+  color:#6DC231; opacity:.055; line-height:1; pointer-events:none; user-select:none;
+}
+.pt-num { font-size:clamp(2.5rem,6.5vw,4rem); font-weight:900; color:#6DC231; letter-spacing:2px; line-height:1; }
+.green-bar { width:55px; height:4px; background:#6DC231; border-radius:2px; margin:6px 0 18px; }
+.pt-head { font-size:clamp(1.2rem,3vw,1.75rem); font-weight:900; color:#fff; line-height:1.15; margin-bottom:14px; }
+.pt-desc { font-size:clamp(.72rem,1.5vw,.88rem); color:#A0A8C0; line-height:1.65; }
+.brand-br { position:absolute; bottom:20px; right:28px; font-size:.78rem; font-weight:900; letter-spacing:2px; opacity:.45; }
+.brand-br span { color:#6DC231; }
+
+/* ── SLIDE CTA ───────────────────────────────── */
+.s-cta {
+  background: linear-gradient(135deg,#4A8F1F 0%,#6DC231 55%,#3D7A15 100%);
+  align-items:center; justify-content:center; text-align:center; padding:36px 44px;
+}
+.s-cta .hex-bg {
+  position:absolute; inset:0; pointer-events:none;
+  background-image:
+    repeating-linear-gradient(60deg, rgba(26,28,38,.06) 0px, rgba(26,28,38,.06) 1px, transparent 1px, transparent 28px),
+    repeating-linear-gradient(120deg, rgba(26,28,38,.06) 0px, rgba(26,28,38,.06) 1px, transparent 1px, transparent 28px);
+}
+.s-cta .brand-big { font-size:clamp(1.8rem,5.5vw,3.2rem); font-weight:900; letter-spacing:4px; color:#3D4257; position:relative; z-index:1; }
+.s-cta .brand-big span { color:#1A1C26; opacity:.55; }
+.s-cta .cta-txt { font-size:clamp(.78rem,1.7vw,.95rem); font-weight:700; color:#3D4257; margin:18px 0; line-height:1.5; max-width:82%; position:relative; z-index:1; }
+.s-cta .social { font-size:clamp(.6rem,1.2vw,.75rem); color:#3D4257; opacity:.68; position:relative; z-index:1; }
+
+/* ── SLIDE CRÉDITOS ──────────────────────────── */
+.s-credits { background:#3D4257; padding:36px 44px 60px 52px; justify-content:center; }
+.s-credits .lbl { font-size:.68rem; font-weight:700; letter-spacing:3px; color:#A0A8C0; text-transform:uppercase; margin-bottom:14px; }
+.s-credits .sname { font-size:clamp(1.3rem,3.5vw,2rem); font-weight:900; color:#fff; margin-bottom:10px; }
+.s-credits .surl { font-size:.7rem; color:#6DC231; word-break:break-all; margin-bottom:20px; }
+.s-credits .divider { height:2px; background:rgba(109,194,49,.28); margin-bottom:16px; }
+.s-credits .disc { font-size:.7rem; color:#A0A8C0; font-style:italic; line-height:1.6; }
+.brand-bc { position:absolute; bottom:24px; left:50%; transform:translateX(-50%); font-size:.95rem; font-weight:900; letter-spacing:3px; white-space:nowrap; }
+.brand-bc span { color:#6DC231; }
+
+/* ── INDICADORES ─────────────────────────────── */
+.inds { display:flex; justify-content:center; gap:8px; margin-top:18px; }
+.dot { width:8px; height:8px; border-radius:50%; background:#3D4257; border:2px solid #A0A8C0; cursor:pointer; transition:all .2s; }
+.dot.active { background:#6DC231; border-color:#6DC231; transform:scale(1.35); }
+
+/* indicadores dentro del slide */
+.slide-inds { position:absolute; bottom:16px; left:50%; transform:translateX(-50%); display:flex; gap:7px; z-index:10; }
+.sd { width:6px; height:6px; border-radius:50%; background:rgba(160,168,192,.35); }
+.sd.a { background:#6DC231; transform:scale(1.45); }
+</style>
+</head>
+<body>
+
+<h1>AGRO <span>PARALLEL</span></h1>
+<p class="sub">PREVIEW DE CARRUSEL · DISEÑO FINAL</p>
+
+<div class="tabs">
+  <div class="tab active" onclick="setFmt('square',this)">1:1 FEED</div>
+  <div class="tab" onclick="setFmt('vertical',this)">4:5 VERTICAL</div>
+  <div class="tab" onclick="setFmt('horizontal',this)">16:9 FACEBOOK</div>
+  <div class="tab" onclick="setFmt('story',this)">9:16 STORY</div>
+</div>
+
+<div class="viewer">
+  <button class="nav" onclick="prev()">&#8592;</button>
+  <div>
+    <p class="counter" id="ctr">SLIDE 1 / 6</p>
+    <div class="wrap fmt-square" id="wrap">
+
+      <!-- SLIDE 1 TÍTULO -->
+      <div class="slide s-title dots active" id="s0">
+        <div class="cat" id="cat">Tecnología</div>
+        <div class="title" id="ttl">Drones autónomos reducen 40% el uso de agroquímicos en cultivos extensivos</div>
+        <div class="src-wrap"><div class="src" id="src">Fuente: AgFunder News · Internacional</div></div>
+        <div class="brand-tr">AGRO <span>PARALLEL</span></div>
+        <div class="slide-inds" id="si0"></div>
+      </div>
+
+      <!-- SLIDE 2 DATO 1 -->
+      <div class="slide s-data even" id="s1">
+        <div class="bg-num">01</div>
+        <div class="pt-num">01</div>
+        <div class="green-bar"></div>
+        <div class="pt-head">Tecnología de vuelo autónomo</div>
+        <div class="pt-desc">Los sistemas de IA mapean lotes completos y aplican agroquímicos solo donde es necesario, reduciendo costos operativos hasta un 40%.</div>
+        <div class="brand-br">AGRO <span>PARALLEL</span></div>
+        <div class="slide-inds" id="si1"></div>
+      </div>
+
+      <!-- SLIDE 3 DATO 2 -->
+      <div class="slide s-data odd" id="s2">
+        <div class="bg-num">02</div>
+        <div class="pt-num">02</div>
+        <div class="green-bar"></div>
+        <div class="pt-head">Aplicable en soja y maíz pampeano</div>
+        <div class="pt-desc">En lotes de más de 500 ha de la Pampa Húmeda, los primeros ensayos muestran mejoras en rendimiento y reducción de deriva química.</div>
+        <div class="brand-br">AGRO <span>PARALLEL</span></div>
+        <div class="slide-inds" id="si2"></div>
+      </div>
+
+      <!-- SLIDE 4 DATO 3 -->
+      <div class="slide s-data even" id="s3">
+        <div class="bg-num">03</div>
+        <div class="pt-num">03</div>
+        <div class="green-bar"></div>
+        <div class="pt-head">ROI en menos de 2 temporadas</div>
+        <div class="pt-desc">El costo del sistema se recupera en 18-24 meses por ahorro en insumos y mano de obra. Ideal para pooles de siembra y contratistas.</div>
+        <div class="brand-br">AGRO <span>PARALLEL</span></div>
+        <div class="slide-inds" id="si3"></div>
+      </div>
+
+      <!-- SLIDE 5 CTA -->
+      <div class="slide s-cta" id="s4">
+        <div class="hex-bg"></div>
+        <div class="brand-big">AGRO <span>PARALLEL</span></div>
+        <div class="cta-txt">Seguinos en @agro.parallel para más novedades del campo 🌾</div>
+        <div class="social">📸 @agro.parallel &nbsp;|&nbsp; 👍 AgroParallel &nbsp;|&nbsp; 🌐 www.agroparallel.com</div>
+        <div class="slide-inds" id="si4"></div>
+      </div>
+
+      <!-- SLIDE 6 CRÉDITOS -->
+      <div class="slide s-credits dots" id="s5">
+        <div class="lbl">Fuente Original</div>
+        <div class="sname">AgFunder News</div>
+        <div class="surl">https://agfundernews.com/autonomous-drones-reduce-agrochemical-use</div>
+        <div class="divider"></div>
+        <div class="disc">El contenido fue adaptado y curado por Agro Parallel para el campo argentino.</div>
+        <div class="brand-bc">AGRO <span>PARALLEL</span></div>
+        <div class="slide-inds" id="si5"></div>
+      </div>
+
+    </div>
+    <div class="inds" id="dots"></div>
+  </div>
+  <button class="nav" onclick="next()">&#8594;</button>
+</div>
+
+<script>
+const TOTAL = 6;
+let cur = 0;
+
+const fmts = {
+  square:'fmt-square', vertical:'fmt-vertical',
+  horizontal:'fmt-horizontal', story:'fmt-story'
+};
+
+function buildInds() {
+  // dentro de cada slide
+  for (let s = 0; s < TOTAL; s++) {
+    const c = document.getElementById(`si${s}`);
+    if (!c) continue;
+    c.innerHTML = '';
+    for (let i = 0; i < TOTAL; i++) {
+      const d = document.createElement('div');
+      d.className = 'sd' + (i === s ? ' a' : '');
+      c.appendChild(d);
+    }
+  }
+  // externos
+  const ext = document.getElementById('dots');
+  ext.innerHTML = '';
+  for (let i = 0; i < TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === cur ? ' active' : '');
+    d.onclick = () => goTo(i);
+    ext.appendChild(d);
+  }
+}
+
+function show(n) {
+  document.querySelectorAll('.slide').forEach((s,i) => s.classList.toggle('active', i === n));
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i === n));
+  document.getElementById('ctr').textContent = `SLIDE ${n+1} / ${TOTAL}`;
+  cur = n;
+}
+
+function next() { show((cur + 1) % TOTAL); }
+function prev() { show((cur - 1 + TOTAL) % TOTAL); }
+function goTo(n) { show(n); }
+
+function setFmt(f, el) {
+  const w = document.getElementById('wrap');
+  Object.values(fmts).forEach(c => w.classList.remove(c));
+  w.classList.add(fmts[f]);
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight') next();
+  if (e.key==='ArrowLeft')  prev();
+});
+
+buildInds();
+show(0);
+</script>
+</body>
+</html>

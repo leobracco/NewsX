@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agro Parallel · Noticias del Campo</title>
+  <meta name="description" content="Noticias de agricultura global para el campo argentino">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Lora', serif;
+      background: #12141E;
+      color: #fff;
+      min-height: 100vh;
+      padding-bottom: 48px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      background: #1A1C26;
+      border-bottom: 3px solid #6DC231;
+      padding: 32px 20px 28px;
+      text-align: center;
+    }
+    .header-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      border: 3px solid #6DC231;
+      background: #3D4257;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.5rem; font-weight: 900;
+      letter-spacing: 1px; color: #6DC231;
+    }
+    .header-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.6rem; font-weight: 900;
+      letter-spacing: 3px; color: #fff;
+    }
+    .header-name span { color: #6DC231; }
+    .header-handle {
+      font-size: .85rem; color: #A0A8C0;
+      letter-spacing: 1px; margin: 4px 0 16px;
+    }
+    .header-bio {
+      font-size: .88rem; color: #A0A8C0;
+      line-height: 1.6; max-width: 320px; margin: 0 auto 20px;
+    }
+    .header-socials {
+      display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;
+    }
+    .social-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 40px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .8rem; font-weight: 700; letter-spacing: 1px;
+      text-decoration: none; transition: opacity .2s;
+      border: 1px solid rgba(255,255,255,.15); color: #fff;
+    }
+    .social-pill:hover { opacity: .8; }
+    .social-pill.ig { background: linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); border: none; }
+    .social-pill.fb { background: #1877F2; border: none; }
+    .social-pill.web { background: #6DC231; color: #1A1C26; border: none; }
+
+    /* ── NOTICIAS ── */
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1rem; font-weight: 900; letter-spacing: 3px;
+      color: #A0A8C0; text-transform: uppercase;
+      padding: 28px 20px 16px; text-align: center;
+    }
+    .section-title span {
+      display: inline-block;
+      border-bottom: 2px solid #6DC231;
+      padding-bottom: 6px;
+    }
+
+    .news-list {
+      display: flex; flex-direction: column; gap: 12px;
+      padding: 0 16px; max-width: 480px; margin: 0 auto;
+    }
+
+    .news-card {
+      background: #1A1C26;
+      border: 1px solid rgba(255,255,255,.08);
+      border-left: 4px solid #6DC231;
+      border-radius: 12px;
+      padding: 16px 18px;
+      text-decoration: none; color: inherit;
+      display: block; transition: all .2s;
+      position: relative; overflow: hidden;
+    }
+    .news-card:hover {
+      background: #222436;
+      border-color: rgba(109,194,49,.4);
+      transform: translateY(-2px);
+    }
+    .news-card .cat {
+      display: inline-block;
+      background: #6DC231; color: #1A1C26;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .65rem; font-weight: 900; letter-spacing: 1.5px;
+      padding: 3px 10px; border-radius: 4px; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .news-card h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.15rem; font-weight: 900;
+      line-height: 1.2; color: #fff; margin-bottom: 8px;
+      letter-spacing: .3px;
+    }
+    .news-card p {
+      font-size: .8rem; color: #A0A8C0;
+      line-height: 1.55; margin-bottom: 12px;
+    }
+    .news-card-footer {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .news-card .date {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .72rem; color: #6DC231; letter-spacing: .5px;
+    }
+    .news-card .arrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: .8rem; font-weight: 700;
+      color: #6DC231; letter-spacing: 1px;
+    }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .tag {
+      font-size: .68rem; color: #6DC231;
+      background: rgba(109,194,49,.1);
+      padding: 2px 8px; border-radius: 4px;
+      font-family: 'Barlow Condensed', sans-serif; letter-spacing: .5px;
+    }
+
+    /* ── EMPTY ── */
+    .empty {
+      text-align: center; padding: 60px 24px;
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+    .empty h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.5rem; color: #A0A8C0; font-weight: 700;
+    }
+
+    /* ── FOOTER ── */
+    .bio-footer {
+      text-align: center; padding: 32px 20px 0;
+      font-size: .75rem; color: rgba(160,168,192,.4);
+      letter-spacing: .5px;
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-avatar">AP</div>
+  <div class="header-name">AGRO <span>PARALLEL</span></div>
+  <div class="header-handle">@agro.parallel</div>
+  <p class="header-bio">Noticias de agricultura global adaptadas para el campo argentino 🌾</p>
+  <div class="header-socials">
+    <a href="https://instagram.com/agro.parallel" target="_blank" class="social-pill ig">📸 Instagram</a>
+    <a href="https://facebook.com/AgroParallel" target="_blank" class="social-pill fb">👍 Facebook</a>
+    <a href="https://blog.agroparallel.com" target="_blank" class="social-pill web">🌐 Blog</a>
+  </div>
+</header>
+
+<p class="section-title"><span>Últimas noticias</span></p>
+
+<div class="news-list">
+  <% if (!news || news.length === 0) { %>
+    <div class="empty">
+      <div class="empty-icon">🌾</div>
+      <h2>Pronto las últimas noticias</h2>
+    </div>
+  <% } else { %>
+    <% news.forEach(item => { %>
+      <a href="<%= BASE_URL %>/noticia/<%= item.slug %>" class="news-card" target="_blank">
+        <div class="cat"><%= item.web?.category || 'Agro' %></div>
+        <h2><%= item.web?.title %></h2>
+        <p><%= item.web?.summary ? item.web.summary.substring(0,120) + '…' : '' %></p>
+        <% if (item.web?.tags?.length) { %>
+        <div class="tags">
+          <% item.web.tags.slice(0,3).forEach(t => { %><span class="tag">#<%= t %></span><% }) %>
+        </div>
+        <% } %>
+        <div class="news-card-footer">
+          <span class="date"><%= formatDate(item.publishedAt) %></span>
+          <span class="arrow">Leer más →</span>
+        </div>
+      </a>
+    <% }) %>
+  <% } %>
+</div>
+
+<div class="bio-footer">© <%= new Date().getFullYear() %> Agro Parallel</div>
+
+</body>
+</html>

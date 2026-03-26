@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visor Carruseles · Agro Parallel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Lora:wght@400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Lora', serif; background: #12141E; color: #fff; min-height: 100vh; }
+
+    /* NAV */
+    .nav {
+      background: #1A1C26; border-bottom: 3px solid #6DC231;
+      padding: 0 24px; display: flex; align-items: center;
+      justify-content: space-between; height: 60px;
+    }
+    .nav-logo { font-family:'Barlow Condensed',sans-serif; font-size:1.3rem; font-weight:900; letter-spacing:3px; }
+    .nav-logo span { color:#6DC231; }
+    .nav-back { font-family:'Barlow Condensed',sans-serif; font-size:.85rem; font-weight:700; letter-spacing:1px; color:#A0A8C0; text-decoration:none; }
+    .nav-back:hover { color:#6DC231; }
+
+    /* LAYOUT */
+    .container { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+
+    h1 {
+      font-family:'Barlow Condensed',sans-serif; font-size:2rem; font-weight:900;
+      letter-spacing:2px; margin-bottom:8px;
+    }
+    h1 span { color:#6DC231; }
+    .subtitle { font-size:.85rem; color:#A0A8C0; margin-bottom:32px; }
+
+    /* FORMATO TABS */
+    .fmt-tabs { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
+    .fmt-tab {
+      padding:6px 18px; border:1px solid rgba(255,255,255,.15);
+      border-radius:40px; cursor:pointer;
+      font-family:'Barlow Condensed',sans-serif; font-size:.8rem; font-weight:700;
+      letter-spacing:1px; color:#A0A8C0; background:none; transition:all .2s;
+    }
+    .fmt-tab.active { border-color:#6DC231; color:#6DC231; background:rgba(109,194,49,.08); }
+    .fmt-tab:hover { border-color:#6DC231; color:#6DC231; }
+
+    /* NOTICIAS GRID */
+    .news-grid { display:flex; flex-direction:column; gap:40px; }
+
+    .news-item {
+      background:#1A1C26; border:1px solid rgba(255,255,255,.08);
+      border-radius:16px; overflow:hidden;
+    }
+
+    .news-item-header {
+      padding:20px 24px 16px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex; justify-content:space-between; align-items:flex-start; gap:16px;
+    }
+    .news-item-header .cat {
+      display:inline-block; background:#6DC231; color:#1A1C26;
+      font-family:'Barlow Condensed',sans-serif; font-size:.68rem; font-weight:900;
+      letter-spacing:1.5px; padding:3px 10px; border-radius:4px;
+      text-transform:uppercase; margin-bottom:8px;
+    }
+    .news-item-header h2 {
+      font-family:'Barlow Condensed',sans-serif; font-size:1.3rem;
+      font-weight:900; line-height:1.2; color:#fff;
+    }
+    .news-item-header .date { font-size:.75rem; color:#A0A8C0; white-space:nowrap; }
+
+    /* SLIDES VIEWER */
+    .slides-section { padding:20px 24px; }
+    .slides-label {
+      font-family:'Barlow Condensed',sans-serif; font-size:.8rem; font-weight:700;
+      letter-spacing:2px; color:#A0A8C0; text-transform:uppercase; margin-bottom:14px;
+    }
+
+    .slides-viewer { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+    .slide-nav {
+      width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.2);
+      background:none; color:#fff; cursor:pointer; font-size:1rem;
+      display:flex; align-items:center; justify-content:center;
+      flex-shrink:0; transition:all .2s;
+    }
+    .slide-nav:hover { border-color:#6DC231; color:#6DC231; }
+
+    .slide-frame {
+      flex:1; display:flex; flex-direction:column; align-items:center; gap:10px;
+    }
+    .slide-img {
+      border-radius:10px; object-fit:contain;
+      border:1px solid rgba(255,255,255,.08);
+      max-height:480px; max-width:100%;
+      background:#0D0F18;
+    }
+    .slide-counter {
+      font-family:'Barlow Condensed',sans-serif; font-size:.8rem;
+      color:#A0A8C0; letter-spacing:2px;
+    }
+    .slide-dots { display:flex; gap:6px; }
+    .slide-dot {
+      width:7px; height:7px; border-radius:50%;
+      background:rgba(160,168,192,.3); cursor:pointer; transition:all .2s;
+    }
+    .slide-dot.active { background:#6DC231; transform:scale(1.3); }
+
+    /* CAPTION & HASHTAGS */
+    .copy-section { padding:0 24px 24px; display:flex; flex-direction:column; gap:12px; }
+    .copy-block { background:#0D0F18; border:1px solid rgba(255,255,255,.08); border-radius:10px; }
+    .copy-block-header {
+      padding:10px 14px; border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex; justify-content:space-between; align-items:center;
+    }
+    .copy-block-label {
+      font-family:'Barlow Condensed',sans-serif; font-size:.75rem; font-weight:700;
+      letter-spacing:2px; color:#A0A8C0; text-transform:uppercase;
+    }
+    .copy-btn {
+      padding:4px 14px; border-radius:20px; border:1px solid rgba(109,194,49,.4);
+      background:none; color:#6DC231; cursor:pointer;
+      font-family:'Barlow Condensed',sans-serif; font-size:.72rem; font-weight:700;
+      letter-spacing:1px; transition:all .2s;
+    }
+    .copy-btn:hover { background:rgba(109,194,49,.1); }
+    .copy-btn.copied { border-color:#6DC231; background:rgba(109,194,49,.15); color:#fff; }
+    .copy-text {
+      padding:12px 14px; font-size:.82rem; color:#D0D4E0;
+      line-height:1.65; white-space:pre-wrap; word-break:break-word;
+    }
+    .copy-text.hashtags { color:#6DC231; font-size:.78rem; }
+
+    /* EMPTY */
+    .no-slides {
+      padding:40px; text-align:center;
+      font-family:'Barlow Condensed',sans-serif; font-size:1rem;
+      color:#A0A8C0; letter-spacing:1px;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      text-align:center; padding:80px 24px;
+    }
+    .empty-state h2 {
+      font-family:'Barlow Condensed',sans-serif; font-size:2rem; color:#A0A8C0;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">AGRO <span>PARALLEL</span> <span style="color:#A0A8C0;font-size:1rem;font-weight:700"> · VISOR</span></div>
+  <a href="/" class="nav-back">← Volver al blog</a>
+</nav>
+
+<div class="container">
+  <h1>Carruseles <span>generados</span></h1>
+  <p class="subtitle"><%= news.length %> noticia<%= news.length !== 1 ? 's' : '' %> · Seleccioná el formato y copiá el contenido</p>
+
+  <!-- FORMATO TABS -->
+  <div class="fmt-tabs">
+    <button class="fmt-tab active" onclick="setFormat('vertical', this)">4:5 Vertical (IG recomendado)</button>
+    <button class="fmt-tab" onclick="setFormat('square', this)">1:1 Square (feed)</button>
+    <button class="fmt-tab" onclick="setFormat('story', this)">9:16 Story</button>
+    <button class="fmt-tab" onclick="setFormat('horizontal', this)">16:9 Facebook</button>
+  </div>
+
+  <% if (!news || news.length === 0) { %>
+    <div class="empty-state">
+      <div style="font-size:3rem;margin-bottom:16px">🌾</div>
+      <h2>Sin noticias generadas aún</h2>
+      <p style="color:#A0A8C0;margin-top:8px">Ejecutá el pipeline primero</p>
+    </div>
+  <% } else { %>
+
+  <div class="news-grid">
+    <% news.forEach((item, ni) => { %>
+      <% const slides = item.slides || []; %>
+      <div class="news-item" id="item-<%= ni %>">
+
+        <!-- HEADER -->
+        <div class="news-item-header">
+          <div>
+            <div class="cat"><%= item.web?.category || 'Agro' %></div>
+            <h2><%= item.web?.title %></h2>
+          </div>
+          <span class="date"><%= formatDate(item.publishedAt) %></span>
+        </div>
+
+        <!-- SLIDES VIEWER -->
+        <div class="slides-section">
+          <div class="slides-label">Slides del carrusel</div>
+          <div class="slides-viewer">
+            <button class="slide-nav" onclick="prevSlide(<%= ni %>)">&#8592;</button>
+            <div class="slide-frame">
+              <img class="slide-img" id="slide-img-<%= ni %>"
+                src="<%= slides.vertical && slides.vertical[0] ? BASE_URL + '/carruseles/' + item.botItemId + '/vertical/' + slides.vertical[0] : '' %>"
+                alt="Slide 1"
+                onerror="this.style.opacity='0.3'; this.alt='Sin imagen'"
+              >
+              <div class="slide-counter" id="slide-counter-<%= ni %>">SLIDE 1 / <%= slides.vertical ? slides.vertical.length : 0 %></div>
+              <div class="slide-dots" id="slide-dots-<%= ni %>">
+                <% const slideCount = slides.vertical ? slides.vertical.length : 0; %>
+                <% for(let d=0; d<slideCount; d++) { %>
+                  <div class="slide-dot <%= d===0?'active':'' %>" onclick="goToSlide(<%= ni %>, <%= d %>)"></div>
+                <% } %>
+              </div>
+            </div>
+            <button class="slide-nav" onclick="nextSlide(<%= ni %>)">&#8594;</button>
+          </div>
+        </div>
+
+        <!-- CAPTION & HASHTAGS -->
+        <div class="copy-section">
+          <div class="copy-block">
+            <div class="copy-block-header">
+              <span class="copy-block-label">Caption Instagram</span>
+              <button class="copy-btn" onclick="copyText(this, 'caption-<%= ni %>')">Copiar</button>
+            </div>
+            <div class="copy-text" id="caption-<%= ni %>"><%= item.instagram?.caption || 'Sin caption generado' %></div>
+          </div>
+          <div class="copy-block">
+            <div class="copy-block-header">
+              <span class="copy-block-label">Hashtags</span>
+              <button class="copy-btn" onclick="copyText(this, 'hashtags-<%= ni %>')">Copiar</button>
+            </div>
+            <div class="copy-text hashtags" id="hashtags-<%= ni %>"><%= item.instagram?.hashtags || '' %></div>
+          </div>
+        </div>
+
+      </div>
+    <% }) %>
+  </div>
+
+  <% } %>
+</div>
+
+<script>
+  const newsData = <%- JSON.stringify(news.map(item => ({
+    botItemId: item.botItemId,
+    slides: item.slides || {}
+  }))) %>;
+
+  let currentFormat = 'vertical';
+  let currentSlides = newsData.map(() => 0);
+
+  const BASE_URL = '<%= BASE_URL %>';
+
+  function setFormat(fmt, btn) {
+    currentFormat = fmt;
+    document.querySelectorAll('.fmt-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    newsData.forEach((item, ni) => {
+      currentSlides[ni] = 0;
+      updateSlide(ni);
+    });
+  }
+
+  function updateSlide(ni) {
+    const item   = newsData[ni];
+    const slides = item.slides[currentFormat] || [];
+    const idx    = currentSlides[ni];
+    const img    = document.getElementById('slide-img-' + ni);
+    const ctr    = document.getElementById('slide-counter-' + ni);
+    const dots   = document.getElementById('slide-dots-' + ni);
+
+    if (slides.length && img) {
+      img.src = BASE_URL + '/carruseles/' + item.botItemId + '/' + currentFormat + '/' + slides[idx];
+      img.style.opacity = '1';
+    }
+
+    if (ctr) ctr.textContent = 'SLIDE ' + (idx+1) + ' / ' + slides.length;
+
+    if (dots) {
+      // Rebuild dots for new format
+      dots.innerHTML = '';
+      slides.forEach((_, d) => {
+        const dot = document.createElement('div');
+        dot.className = 'slide-dot' + (d === idx ? ' active' : '');
+        dot.onclick = () => goToSlide(ni, d);
+        dots.appendChild(dot);
+      });
+    }
+  }
+
+  function nextSlide(ni) {
+    const slides = newsData[ni].slides[currentFormat] || [];
+    if (!slides.length) return;
+    currentSlides[ni] = (currentSlides[ni] + 1) % slides.length;
+    updateSlide(ni);
+  }
+
+  function prevSlide(ni) {
+    const slides = newsData[ni].slides[currentFormat] || [];
+    if (!slides.length) return;
+    currentSlides[ni] = (currentSlides[ni] - 1 + slides.length) % slides.length;
+    updateSlide(ni);
+  }
+
+  function goToSlide(ni, idx) {
+    currentSlides[ni] = idx;
+    updateSlide(ni);
+  }
+
+  function copyText(btn, id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    navigator.clipboard.writeText(el.textContent.trim()).then(() => {
+      btn.textContent = '✅ Copiado';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') newsData.forEach((_, ni) => nextSlide(ni));
+    if (e.key === 'ArrowLeft')  newsData.forEach((_, ni) => prevSlide(ni));
+  });
+</script>
+</body>
+</html>

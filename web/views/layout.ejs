@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' · ' : '' %>Agro Parallel</title>
+  <meta name="description" content="<%= typeof metaDesc !== 'undefined' ? metaDesc : 'Noticias de agricultura para el campo argentino' %>">
+
+  <!-- OG Tags -->
+  <meta property="og:site_name" content="Agro Parallel">
+  <meta property="og:type" content="website">
+  <% if (typeof ogTitle !== 'undefined') { %>
+  <meta property="og:title" content="<%= ogTitle %>">
+  <meta property="og:description" content="<%= ogDesc %>">
+  <% } %>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-inner">
+    <a href="/" class="logo">AGRO <span>PARALLEL</span></a>
+    <nav class="nav-links">
+      <a href="/?categoria=Tecnología">Tecnología</a>
+      <a href="/?categoria=Mercados">Mercados</a>
+      <a href="/?categoria=Cultivos">Cultivos</a>
+      <a href="/?categoria=Ganadería">Ganadería</a>
+      <a href="/?categoria=Maquinaria">Maquinaria</a>
+    </nav>
+    <div class="nav-search">
+      <form action="/" method="get">
+        <input type="text" name="q" placeholder="Buscar noticias…" value="<%= typeof search !== 'undefined' && search ? search : '' %>">
+        <button type="submit">&#9906;</button>
+      </form>
+    </div>
+    <button class="nav-burger" onclick="toggleMenu()">&#9776;</button>
+  </div>
+  <!-- Mobile menu -->
+  <div class="nav-mobile" id="navMobile">
+    <a href="/?categoria=Tecnología">Tecnología</a>
+    <a href="/?categoria=Mercados">Mercados</a>
+    <a href="/?categoria=Cultivos">Cultivos</a>
+    <a href="/?categoria=Ganadería">Ganadería</a>
+    <a href="/?categoria=Maquinaria">Maquinaria</a>
+    <a href="/?categoria=Sostenibilidad">Sostenibilidad</a>
+    <form action="/" method="get" style="margin-top:16px">
+      <input type="text" name="q" placeholder="Buscar…" class="mobile-search">
+    </form>
+  </div>
+</header>
+
+<!-- CONTENIDO -->
+<main>
+  <%- body %>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo">AGRO <span>PARALLEL</span></div>
+      <p>Noticias de agricultura global adaptadas para el campo argentino.</p>
+    </div>
+    <div class="footer-social">
+      <a href="https://instagram.com/agro.parallel" target="_blank" rel="noopener">📸 Instagram</a>
+      <a href="https://facebook.com/AgroParallel" target="_blank" rel="noopener">👍 Facebook</a>
+      <a href="https://www.agroparallel.com" target="_blank" rel="noopener">🌐 Web</a>
+    </div>
+    <p class="footer-copy">© <%= new Date().getFullYear() %> Agro Parallel · Todos los derechos reservados</p>
+  </div>
+</footer>
+
+<script src="/js/main.js"></script>
+</body>
+</html>

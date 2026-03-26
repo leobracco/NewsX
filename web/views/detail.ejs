@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= news.web?.title %> · Agro Parallel</title>
+  <meta name="description" content="<%= excerpt(news.web?.summary||'', 160) %>">
+  <meta property="og:title" content="<%= news.web?.title %>">
+  <meta property="og:description" content="<%= excerpt(news.web?.summary||'', 160) %>">
+  <meta property="og:site_name" content="Agro Parallel">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<%- include('_nav', { search: null }) %>
+
+<% const shareUrl = 'https://blog.agroparallel.com/noticia/' + news.slug %>
+
+<article class="detail-wrap">
+  <header class="detail-header">
+    <div class="detail-header-inner">
+      <div class="breadcrumb">
+        <a href="/">Inicio</a> <span>›</span>
+        <a href="/?categoria=<%= encodeURIComponent(news.web?.category||'') %>"><%= news.web?.category %></a>
+      </div>
+      <div class="detail-cat"><%= news.web?.category %></div>
+      <h1 class="detail-title"><%= news.web?.title %></h1>
+      <div class="detail-meta">
+        <span>📰 <%= news.source?.name %></span>
+        <span>📅 <%= formatDate(news.publishedAt) %></span>
+      </div>
+      <div class="detail-share">
+        <span>Compartir:</span>
+        <a href="https://wa.me/?text=<%= encodeURIComponent(news.web?.title + ' - ' + shareUrl) %>" target="_blank" class="share-pill whatsapp">WhatsApp</a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(shareUrl) %>" target="_blank" class="share-pill facebook">Facebook</a>
+        <a href="https://twitter.com/intent/tweet?text=<%= encodeURIComponent(news.web?.title + ' via @agroparallel') %>&url=<%= encodeURIComponent(shareUrl) %>" target="_blank" class="share-pill twitter">X / Twitter</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="detail-body">
+    <div class="detail-content">
+      <div class="detail-summary">
+        <% (news.web?.summary||'').split('\n').filter(p=>p.trim()).forEach(para => { %>
+          <p><%= para %></p>
+        <% }) %>
+      </div>
+
+      <% if (news.carousel?.points?.length) { %>
+      <div class="detail-keypoints">
+        <h2>Puntos clave</h2>
+        <div class="keypoints-grid">
+          <% news.carousel.points.forEach((pt, i) => { %>
+          <div class="keypoint">
+            <div class="kp-num">0<%= i+1 %></div>
+            <div class="kp-content">
+              <h3><%= pt.headline %></h3>
+              <p><%= pt.description %></p>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+      </div>
+      <% } %>
+
+      <% if (news.web?.tags?.length) { %>
+      <div class="detail-tags">
+        <% news.web.tags.forEach(tag => { %><a href="/?q=<%= encodeURIComponent(tag) %>" class="tag">#<%= tag %></a><% }) %>
+      </div>
+      <% } %>
+
+      <div class="detail-source-box">
+        <p>📰 <strong>Fuente original:</strong>
+          <a href="<%= news.source?.url %>" target="_blank" rel="noopener nofollow"><%= news.source?.name %> ↗</a>
+        </p>
+        <p class="detail-disclaimer">Contenido adaptado y curado por Agro Parallel para el campo argentino.</p>
+      </div>
+    </div>
+
+    <aside class="detail-sidebar">
+      <div class="sidebar-card social-card">
+        <div class="sc-brand">AGRO <span>PARALLEL</span></div>
+        <p>Seguinos para más noticias del campo argentino</p>
+        <a href="https://instagram.com/agro.parallel" target="_blank" class="sc-btn ig">📸 @agro.parallel</a>
+        <a href="https://facebook.com/AgroParallel" target="_blank" class="sc-btn fb">👍 AgroParallel</a>
+      </div>
+      <% if (news.instagram) { %>
+      <div class="sidebar-card ig-card">
+        <div class="ig-card-header">
+          <strong>AGRO <span style="color:#6DC231">PARALLEL</span></strong>
+          <small>@agro.parallel</small>
+        </div>
+        <p class="ig-caption"><%= excerpt(news.instagram.caption, 200) %></p>
+        <p class="ig-hashtags"><%= news.instagram.hashtags %></p>
+      </div>
+      <% } %>
+    </aside>
+  </div>
+</article>
+
+<% if (related && related.length > 0) { %>
+<section class="related-section">
+  <div class="related-inner">
+    <h2 class="related-title">Más de <em><%= news.web?.category %></em></h2>
+    <div class="related-grid">
+      <% related.forEach(r => { %>
+      <article class="news-card small">
+        <div class="card-cat"><a href="/?categoria=<%= encodeURIComponent(r.web?.category||'') %>"><%= r.web?.category %></a></div>
+        <div class="card-body">
+          <h2 class="card-title"><a href="/noticia/<%= r.slug %>"><%= r.web?.title %></a></h2>
+          <p class="card-summary"><%= excerpt(r.web?.summary||'', 120) %></p>
+        </div>
+        <div class="card-footer">
+          <span class="card-date"><%= formatDate(r.publishedAt) %></span>
+          <a href="/noticia/<%= r.slug %>" class="btn-read">Leer →</a>
+        </div>
+      </article>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<%- include('_footer') %>
+<script src="/js/main.js"></script>
+</body>
+</html>

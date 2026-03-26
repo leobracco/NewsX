@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= currentCat ? currentCat + ' · ' : '' %>Agro Parallel</title>
+  <meta name="description" content="Noticias de agricultura global adaptadas para el campo argentino.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+
+<%- include('_nav') %>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">🌾 Campo Argentino · Noticias Globales</div>
+    <% if (currentCat) { %><h1><em><%= currentCat %></em></h1>
+    <% } else if (search) { %><h1>Búsqueda: <em>"<%= search %>"</em></h1>
+    <% } else { %><h1>El campo argentino,<br><em>al día con el mundo</em></h1><% } %>
+    <% if (search) { %>
+      <p class="hero-sub"><%= totalRows %> resultado<%= totalRows !== 1 ? 's' : '' %> · <a href="/">Limpiar</a></p>
+    <% } %>
+  </div>
+  <div class="hero-line"></div>
+</section>
+
+<% if (categories && categories.length > 0) { %>
+<section class="filters">
+  <div class="filters-inner">
+    <a href="/" class="filter-pill <%= !currentCat ? 'active' : '' %>">Todas</a>
+    <% categories.forEach(c => { %>
+      <a href="/?categoria=<%= encodeURIComponent(c.category) %>" class="filter-pill <%= currentCat === c.category ? 'active' : '' %>"><%= c.category %></a>
+    <% }) %>
+  </div>
+</section>
+<% } %>
+
+<section class="news-grid-section">
+  <div class="grid-inner">
+    <% if (!news || news.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-icon">🌾</div>
+        <h2>Sin noticias aún</h2>
+        <p>Ejecutá <code>node src/scheduler.js --run-now</code> para generar el primer contenido.</p>
+        <% if (search || currentCat) { %><a href="/" class="btn-primary">Ver todas</a><% } %>
+      </div>
+    <% } else { %>
+      <% news.forEach((item, i) => { %>
+        <article class="news-card <%= i===0 && !currentCat && !search && page===1 ? 'featured' : '' %>">
+          <div class="card-cat">
+            <a href="/?categoria=<%= encodeURIComponent(item.web?.category||'') %>"><%= item.web?.category||'General' %></a>
+          </div>
+          <div class="card-body">
+            <h2 class="card-title"><a href="/noticia/<%= item.slug %>"><%= item.web?.title||'Sin título' %></a></h2>
+            <p class="card-summary"><%= excerpt(item.web?.summary||'', 180) %></p>
+          </div>
+          <div class="card-footer">
+            <div class="card-meta">
+              <span class="card-source"><%= item.source?.name||'' %></span>
+              <span class="card-date"><%= formatDate(item.publishedAt) %></span>
+            </div>
+            <% if (item.web?.tags) { %>
+            <div class="card-tags">
+              <% item.web.tags.slice(0,3).forEach(tag => { %><a href="/?q=<%= encodeURIComponent(tag) %>" class="tag">#<%= tag %></a><% }) %>
+            </div>
+            <% } %>
+            <div class="card-actions">
+              <a href="/noticia/<%= item.slug %>" class="btn-read">Leer más →</a>
+              <div class="share-btns">
+                <a href="https://wa.me/?text=<%= encodeURIComponent((item.web?.title||'') + ' https://blog.agroparallel.com/noticia/' + item.slug) %>" target="_blank" class="share-btn">🟢</a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent('https://blog.agroparallel.com/noticia/'+item.slug) %>" target="_blank" class="share-btn">📘</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      <% }) %>
+    <% } %>
+  </div>
+</section>
+
+<% if (totalPages > 1) { %>
+<nav class="pagination">
+  <div class="pag-inner">
+    <% if (page > 1) { %><a href="?page=<%= page-1 %><%= currentCat?'&categoria='+encodeURIComponent(currentCat):'' %>" class="pag-btn">← Anterior</a><% } %>
+    <div class="pag-pages">
+      <% for (let p=Math.max(1,page-2); p<=Math.min(totalPages,page+2); p++) { %>
+        <a href="?page=<%= p %><%= currentCat?'&categoria='+encodeURIComponent(currentCat):'' %>" class="pag-num <%= p===page?'active':'' %>"><%= p %></a>
+      <% } %>
+    </div>
+    <% if (page < totalPages) { %><a href="?page=<%= page+1 %><%= currentCat?'&categoria='+encodeURIComponent(currentCat):'' %>" class="pag-btn">Siguiente →</a><% } %>
+  </div>
+</nav>
+<% } %>
+
+<%- include('_footer') %>
+<script src="/js/main.js"></script>
+</body>
+</html>
