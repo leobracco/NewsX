@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pipeline · Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+<header class="admin-topbar">
+  <a href="/admin" class="admin-logo">
+    AGRO <span>PARALLEL</span>
+    <span class="badge">Admin</span>
+  </a>
+  <div class="admin-topbar-actions">
+    <a href="/admin" class="admin-topbar-link">← Volver al panel</a>
+    <a href="/admin/logout" class="admin-topbar-link">🚪 Salir</a>
+  </div>
+</header>
+
+<div style="max-width:600px;margin:60px auto;text-align:center;padding:0 20px">
+  <div style="font-size:3rem;margin-bottom:16px">⚡</div>
+  <h1 style="font-size:2rem;font-weight:900;margin-bottom:12px">
+    Ejecutar <span style="color:#6DC231">Pipeline</span>
+  </h1>
+  <p style="color:#A0A8C0;margin-bottom:28px;font-size:.9rem;line-height:1.6;font-weight:400">
+    Esto buscará noticias nuevas, las procesará con IA, generará carruseles y las guardará en la base de datos.
+  </p>
+  <button class="btn btn-green" style="font-size:1rem;padding:14px 32px" onclick="runPipeline()" id="runBtn">
+    🚀 Ejecutar ahora
+  </button>
+  <pre id="logOutput" style="margin-top:24px;text-align:left;background:#1A1C26;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:#A0A8C0;max-height:400px;overflow-y:auto;display:none;white-space:pre-wrap"></pre>
+</div>
+
+<script>
+async function runPipeline() {
+  const btn = document.getElementById('runBtn');
+  const log = document.getElementById('logOutput');
+  btn.disabled = true;
+  btn.textContent = '⏳ Ejecutando...';
+  btn.style.opacity = '.6';
+  log.style.display = 'block';
+  log.textContent = '🌾 Iniciando pipeline...\n';
+  try {
+    const res = await fetch('/api/admin/pipeline', { method: 'POST' });
+    const data = await res.json();
+    if (data.ok) {
+      log.textContent += '✅ Pipeline completado\n';
+      log.textContent += 'Procesadas: ' + (data.processed || 0) + ' noticias\n';
+      btn.textContent = '✅ Completado';
+      btn.style.opacity = '1';
+      setTimeout(() => window.location.href = '/admin', 2000);
+    } else {
+      log.textContent += '❌ Error: ' + (data.error || 'desconocido') + '\n';
+      btn.textContent = '🚀 Reintentar';
+      btn.style.opacity = '1';
+      btn.disabled = false;
+    }
+  } catch (e) {
+    log.textContent += '❌ Error de conexión\n';
+    btn.textContent = '🚀 Reintentar';
+    btn.style.opacity = '1';
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin · Agro Parallel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+<!-- TOPBAR -->
+<header class="admin-topbar">
+  <a href="/admin" class="admin-logo">
+    AGRO <span>PARALLEL</span>
+    <span class="badge">Admin</span>
+  </a>
+  <div class="admin-topbar-actions">
+    <a href="/admin/carruseles" class="admin-topbar-link">🖼️ Visor Carruseles</a>
+    <a href="/" class="admin-topbar-link" target="_blank">🌐 Ver Blog</a>
+  </div>
+</header>
+
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="admin-nav-section">Contenido</div>
+    <a href="/admin" class="admin-nav-item active">
+      <span class="icon">📰</span> Publicaciones
+      <span class="count"><%= news.length %></span>
+    </a>
+    <a href="/admin/carruseles" class="admin-nav-item">
+      <span class="icon">🖼️</span> Carruseles
+    </a>
+
+    <div class="admin-nav-section">Plataformas</div>
+    <a href="/admin?plataforma=instagram" class="admin-nav-item">
+      <span class="icon">📸</span> Instagram
+    </a>
+    <a href="/admin?plataforma=facebook" class="admin-nav-item">
+      <span class="icon">📘</span> Facebook
+    </a>
+    <a href="/admin?plataforma=tiktok" class="admin-nav-item">
+      <span class="icon">🎵</span> TikTok
+      <span class="count" style="background:rgba(243,156,18,.15);color:#F39C12">Pronto</span>
+    </a>
+
+    <div class="admin-nav-section">Sistema</div>
+    <a href="/admin/pipeline" class="admin-nav-item">
+      <span class="icon">⚡</span> Pipeline
+    </a>
+    <a href="/health" class="admin-nav-item" target="_blank">
+      <span class="icon">💚</span> Health Check
+    </a>
+
+    <div class="admin-sidebar-footer">
+      <p>Agro Parallel Admin v1.0</p>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+
+    <!-- HEADER -->
+    <div class="admin-page-header">
+      <div>
+        <h1 class="admin-page-title">
+          <% if (currentCat) { %><em><%= currentCat %></em><% } else { %>Publicaciones<% } %>
+        </h1>
+        <p class="admin-page-subtitle">
+          <%= stats.total %> publicaciones · Última actualización: <%= stats.lastUpdate || 'N/A' %>
+        </p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <a href="/admin/pipeline" class="btn btn-outline">⚡ Ejecutar Pipeline</a>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="admin-stats">
+      <div class="admin-stat green">
+        <div class="stat-value"><%= stats.total %></div>
+        <div class="stat-label">Total</div>
+      </div>
+      <div class="admin-stat blue">
+        <div class="stat-value"><%= stats.published %></div>
+        <div class="stat-label">Publicadas</div>
+      </div>
+      <div class="admin-stat orange">
+        <div class="stat-value"><%= stats.pending %></div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+      <div class="admin-stat red">
+        <div class="stat-value"><%= stats.categories %></div>
+        <div class="stat-label">Categorías</div>
+      </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="admin-toolbar">
+      <input type="text" class="admin-search-input" placeholder="Buscar publicaciones..."
+             id="searchInput" value="<%= search || '' %>" onkeyup="filterTable(this.value)">
+      <select class="admin-filter-select" id="catFilter" onchange="filterByCategory(this.value)">
+        <option value="">Todas las categorías</option>
+        <% categories.forEach(c => { %>
+          <option value="<%= c.category %>" <%= currentCat === c.category ? 'selected' : '' %>><%= c.category %> (<%= c.count %>)</option>
+        <% }) %>
+      </select>
+      <select class="admin-filter-select" id="statusFilter" onchange="filterByStatus(this.value)" style="min-width:130px">
+        <option value="">Todos los estados</option>
+        <option value="published">Publicada</option>
+        <option value="pending">Pendiente</option>
+        <option value="draft">Borrador</option>
+      </select>
+    </div>
+
+    <!-- TABLE -->
+    <% if (!news || news.length === 0) { %>
+      <div class="admin-empty">
+        <div class="icon">🌾</div>
+        <h2>Sin publicaciones</h2>
+        <p>Ejecutá el pipeline para generar contenido</p>
+      </div>
+    <% } else { %>
+    <div class="admin-table-wrap">
+      <table class="admin-table" id="newsTable">
+        <thead>
+          <tr>
+            <th style="width:40px">
+              <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)">
+            </th>
+            <th>Título</th>
+            <th>Categoría</th>
+            <th>Estado</th>
+            <th>Plataformas</th>
+            <th>Fecha</th>
+            <th style="width:140px">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% news.forEach((item, i) => { %>
+          <tr data-id="<%= item._id %>"
+              data-category="<%= item.web?.category || '' %>"
+              data-title="<%= (item.web?.title || '').toLowerCase() %>">
+            <td>
+              <input type="checkbox" class="row-check" value="<%= item._id %>">
+            </td>
+            <td class="title-cell">
+              <a href="/admin/edit/<%= item.slug %>"><%= item.web?.title || 'Sin título' %></a>
+              <div style="font-size:.72rem;color:rgba(160,168,192,.4);margin-top:3px">
+                <%= item.source?.name || '' %>
+              </div>
+            </td>
+            <td>
+              <span class="badge-cat"><%= item.web?.category || 'General' %></span>
+            </td>
+            <td>
+              <% const status = item.publishedTo?.includes('web') ? 'published' : 'pending'; %>
+              <span class="badge-status <%= status %>">
+                <%= status === 'published' ? '✅ Publicada' : '⏳ Pendiente' %>
+              </span>
+            </td>
+            <td>
+              <div style="display:flex;gap:4px;flex-wrap:wrap">
+                <span class="badge-platform active" title="Blog">🌐</span>
+                <span class="badge-platform <%= item.publishedTo?.includes('instagram') ? 'active' : '' %>" title="Instagram">📸</span>
+                <span class="badge-platform <%= item.publishedTo?.includes('facebook') ? 'active' : '' %>" title="Facebook">📘</span>
+              </div>
+            </td>
+            <td style="font-size:.8rem;color:var(--admin-muted);white-space:nowrap">
+              <%= formatDate(item.publishedAt) %>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <a href="/admin/edit/<%= item.slug %>" class="btn-icon" title="Editar">✏️</a>
+                <a href="/noticia/<%= item.slug %>" class="btn-icon" target="_blank" title="Ver en blog">👁️</a>
+                <button class="btn-icon danger" onclick="confirmDelete('<%= item._id %>', '<%= (item.web?.title || '').replace(/'/g, "\\'") %>')" title="Eliminar">🗑️</button>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- BULK ACTIONS -->
+    <div style="margin-top:16px;display:flex;gap:10px;align-items:center" id="bulkActions" hidden>
+      <span style="font-size:.82rem;color:var(--admin-muted)" id="selectedCount">0 seleccionadas</span>
+      <button class="btn btn-sm btn-danger" onclick="bulkDelete()">🗑️ Eliminar selección</button>
+    </div>
+    <% } %>
+
+    <!-- PAGINATION -->
+    <% if (totalPages > 1) { %>
+    <div style="display:flex;justify-content:center;gap:8px;margin-top:24px">
+      <% if (page > 1) { %>
+        <a href="/admin?page=<%= page-1 %><%= currentCat ? '&categoria='+encodeURIComponent(currentCat) : '' %>" class="btn btn-sm btn-outline">← Anterior</a>
+      <% } %>
+      <span style="padding:6px 14px;font-size:.85rem;color:var(--admin-muted)">
+        Página <%= page %> de <%= totalPages %>
+      </span>
+      <% if (page < totalPages) { %>
+        <a href="/admin?page=<%= page+1 %><%= currentCat ? '&categoria='+encodeURIComponent(currentCat) : '' %>" class="btn btn-sm btn-outline">Siguiente →</a>
+      <% } %>
+    </div>
+    <% } %>
+
+  </main>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="admin-modal-overlay" id="deleteModal">
+  <div class="admin-modal">
+    <h3>🗑️ Eliminar publicación</h3>
+    <p id="deleteMsg">¿Estás seguro de que querés eliminar esta publicación? Esta acción no se puede deshacer.</p>
+    <div class="admin-modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('deleteModal')">Cancelar</button>
+      <button class="btn btn-danger" id="confirmDeleteBtn" onclick="executeDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="admin-toast" id="toast"></div>
+
+<script>
+  let deleteTarget = null;
+
+  // ── Search filter ──
+  function filterTable(query) {
+    const q = query.toLowerCase();
+    document.querySelectorAll('#newsTable tbody tr').forEach(row => {
+      const title = row.dataset.title || '';
+      row.style.display = title.includes(q) ? '' : 'none';
+    });
+  }
+
+  function filterByCategory(cat) {
+    if (cat) {
+      window.location.href = '/admin?categoria=' + encodeURIComponent(cat);
+    } else {
+      window.location.href = '/admin';
+    }
+  }
+
+  function filterByStatus(status) {
+    // Client-side filter
+    document.querySelectorAll('#newsTable tbody tr').forEach(row => {
+      if (!status) { row.style.display = ''; return; }
+      const badge = row.querySelector('.badge-status');
+      const rowStatus = badge?.classList.contains(status);
+      row.style.display = rowStatus ? '' : 'none';
+    });
+  }
+
+  // ── Selection ──
+  function toggleSelectAll(cb) {
+    document.querySelectorAll('.row-check').forEach(c => c.checked = cb.checked);
+    updateBulkActions();
+  }
+
+  document.addEventListener('change', e => {
+    if (e.target.classList.contains('row-check')) updateBulkActions();
+  });
+
+  function updateBulkActions() {
+    const checked = document.querySelectorAll('.row-check:checked');
+    const bulk = document.getElementById('bulkActions');
+    if (checked.length > 0) {
+      bulk.hidden = false;
+      document.getElementById('selectedCount').textContent = checked.length + ' seleccionada' + (checked.length > 1 ? 's' : '');
+    } else {
+      bulk.hidden = true;
+    }
+  }
+
+  // ── Delete ──
+  function confirmDelete(id, title) {
+    deleteTarget = id;
+    document.getElementById('deleteMsg').textContent =
+      '¿Estás seguro de que querés eliminar "' + title + '"? Esta acción no se puede deshacer.';
+    document.getElementById('deleteModal').classList.add('open');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    deleteTarget = null;
+  }
+
+  async function executeDelete() {
+    if (!deleteTarget) return;
+    try {
+      const res = await fetch('/api/admin/news/' + deleteTarget, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('Publicación eliminada');
+        const row = document.querySelector('tr[data-id="' + deleteTarget + '"]');
+        if (row) row.remove();
+      } else {
+        showToast('Error: ' + (data.error || 'desconocido'), true);
+      }
+    } catch (e) {
+      showToast('Error de conexión', true);
+    }
+    closeModal('deleteModal');
+  }
+
+  async function bulkDelete() {
+    const ids = [...document.querySelectorAll('.row-check:checked')].map(c => c.value);
+    if (!ids.length) return;
+    if (!confirm('¿Eliminar ' + ids.length + ' publicaciones?')) return;
+
+    for (const id of ids) {
+      try {
+        await fetch('/api/admin/news/' + id, { method: 'DELETE' });
+        const row = document.querySelector('tr[data-id="' + id + '"]');
+        if (row) row.remove();
+      } catch (e) {}
+    }
+    showToast(ids.length + ' publicaciones eliminadas');
+    updateBulkActions();
+  }
+
+  // ── Toast ──
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'admin-toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.className = 'admin-toast', 3000);
+  }
+
+  // Close modal on overlay click
+  document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal('deleteModal');
+  });
+
+  // Keyboard
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal('deleteModal');
+  });
+</script>
+</body>
+</html>

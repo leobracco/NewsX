@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar · <%= news.web?.title %> · Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+
+<!-- TOPBAR -->
+<header class="admin-topbar">
+  <a href="/admin" class="admin-logo">
+    AGRO <span>PARALLEL</span>
+    <span class="badge">Admin</span>
+  </a>
+  <div class="admin-topbar-actions">
+    <a href="/noticia/<%= news.slug %>" class="admin-topbar-link" target="_blank">👁️ Ver en Blog</a>
+    <a href="/admin" class="admin-topbar-link">← Volver</a>
+  </div>
+</header>
+
+<div class="admin-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="admin-nav-section">Contenido</div>
+    <a href="/admin" class="admin-nav-item">
+      <span class="icon">📰</span> Publicaciones
+    </a>
+    <a href="/admin/carruseles" class="admin-nav-item">
+      <span class="icon">🖼️</span> Carruseles
+    </a>
+
+    <div class="admin-nav-section">Esta publicación</div>
+    <a href="#section-web" class="admin-nav-item active">
+      <span class="icon">🌐</span> Web / Blog
+    </a>
+    <a href="#section-ig" class="admin-nav-item">
+      <span class="icon">📸</span> Instagram
+    </a>
+    <a href="#section-fb" class="admin-nav-item">
+      <span class="icon">📘</span> Facebook
+    </a>
+    <a href="#section-carousel" class="admin-nav-item">
+      <span class="icon">🖼️</span> Carrusel
+    </a>
+
+    <div class="admin-sidebar-footer">
+      <p>Slug: <%= news.slug %></p>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+
+    <!-- HEADER -->
+    <div class="admin-page-header">
+      <div>
+        <h1 class="admin-page-title">Editar <em>publicación</em></h1>
+        <p class="admin-page-subtitle">
+          <span class="badge-cat" style="vertical-align:middle"><%= news.web?.category %></span>
+          &nbsp;·&nbsp; <%= formatDate(news.publishedAt) %>
+          &nbsp;·&nbsp; <%= news.source?.name %>
+        </p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline" onclick="resetForm()">↩️ Deshacer</button>
+        <button class="btn btn-green" onclick="saveChanges()">💾 Guardar cambios</button>
+      </div>
+    </div>
+
+    <form id="editForm" onsubmit="return false">
+
+    <div class="admin-form-grid">
+      <!-- LEFT: FORM -->
+      <div>
+
+        <!-- WEB SECTION -->
+        <div class="admin-form-section" id="section-web" style="margin-bottom:24px">
+          <div class="admin-form-section-header">
+            <h3>🌐 Contenido Web / Blog</h3>
+          </div>
+          <div class="admin-form-body">
+            <div class="form-group">
+              <label class="form-label">Título</label>
+              <input type="text" class="form-input" name="web_title"
+                     value="<%= news.web?.title || '' %>" maxlength="100"
+                     oninput="updatePreview()">
+              <p class="form-help">Máx. 80 caracteres · Aparece en el blog y SEO</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Resumen</label>
+              <textarea class="form-textarea" name="web_summary" rows="5"
+                        oninput="updatePreview()"><%= news.web?.summary || '' %></textarea>
+              <p class="form-help">150-200 palabras · Cuerpo principal del artículo</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Categoría</label>
+              <select class="form-select" name="web_category" onchange="updatePreview()">
+                <% ['Tecnología','Mercados','Ganadería','Cultivos','Maquinaria','Sostenibilidad'].forEach(cat => { %>
+                  <option value="<%= cat %>" <%= news.web?.category === cat ? 'selected' : '' %>><%= cat %></option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tags</label>
+              <div class="form-tags-input" id="tagsContainer">
+                <% (news.web?.tags || []).forEach(tag => { %>
+                  <span class="form-tag" data-tag="<%= tag %>">
+                    #<%= tag %>
+                    <span class="remove-tag" onclick="removeTag(this)">✕</span>
+                  </span>
+                <% }) %>
+                <input type="text" style="background:none;border:none;color:#fff;outline:none;font-family:inherit;font-size:.82rem;flex:1;min-width:80px"
+                       placeholder="Agregar tag..." onkeydown="addTag(event, this)">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- INSTAGRAM SECTION -->
+        <div class="admin-form-section" id="section-ig" style="margin-bottom:24px">
+          <div class="admin-form-section-header">
+            <h3>📸 Instagram</h3>
+          </div>
+          <div class="admin-form-body">
+            <div class="form-group">
+              <label class="form-label">Caption</label>
+              <textarea class="form-textarea" name="ig_caption" rows="5"
+                        oninput="updatePreview()"><%= news.instagram?.caption || '' %></textarea>
+              <p class="form-help">100-150 palabras · Empieza con emoji</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Hashtags</label>
+              <textarea class="form-textarea" name="ig_hashtags" rows="2"
+                        style="font-family:'Barlow Condensed',sans-serif;color:var(--admin-green)"
+                        oninput="updatePreview()"><%= news.instagram?.hashtags || '' %></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- FACEBOOK SECTION -->
+        <div class="admin-form-section" id="section-fb" style="margin-bottom:24px">
+          <div class="admin-form-section-header">
+            <h3>📘 Facebook</h3>
+          </div>
+          <div class="admin-form-body">
+            <div class="form-group">
+              <label class="form-label">Post</label>
+              <textarea class="form-textarea" name="fb_post" rows="6"
+                        oninput="updatePreview()"><%= news.facebook?.post || '' %></textarea>
+              <p class="form-help">200-250 palabras · Cerrá con pregunta</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Título del Link Preview</label>
+              <input type="text" class="form-input" name="fb_link_title"
+                     value="<%= news.facebook?.link_title || '' %>" maxlength="60"
+                     oninput="updatePreview()">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Descripción del Link Preview</label>
+              <input type="text" class="form-input" name="fb_link_desc"
+                     value="<%= news.facebook?.link_description || '' %>" maxlength="100"
+                     oninput="updatePreview()">
+            </div>
+          </div>
+        </div>
+
+        <!-- CAROUSEL SECTION -->
+        <div class="admin-form-section" id="section-carousel" style="margin-bottom:24px">
+          <div class="admin-form-section-header">
+            <h3>🖼️ Carrusel</h3>
+            <span style="font-size:.72rem;color:var(--admin-muted)">Los cambios se reflejan al regenerar</span>
+          </div>
+          <div class="admin-form-body">
+            <div class="form-group">
+              <label class="form-label">Título del carrusel</label>
+              <input type="text" class="form-input" name="carousel_title"
+                     value="<%= news.carousel?.title || '' %>" maxlength="55">
+              <p class="form-help">Máx. 55 caracteres</p>
+            </div>
+
+            <div id="pointsContainer">
+              <% (news.carousel?.points || []).forEach((pt, i) => { %>
+              <div class="form-group" data-point="<%= i %>" style="background:var(--admin-bg);border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid var(--admin-border)">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                  <span style="font-size:.88rem;font-weight:900;color:var(--admin-green)">PUNTO 0<%= i+1 %></span>
+                  <button type="button" class="btn-icon danger" onclick="removePoint(this)" title="Eliminar punto">✕</button>
+                </div>
+                <div class="form-group" style="margin-bottom:10px">
+                  <label class="form-label">Headline</label>
+                  <input type="text" class="form-input" name="point_headline_<%= i %>"
+                         value="<%= pt.headline %>" maxlength="45">
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                  <label class="form-label">Descripción</label>
+                  <input type="text" class="form-input" name="point_desc_<%= i %>"
+                         value="<%= pt.description %>" maxlength="110">
+                </div>
+              </div>
+              <% }) %>
+            </div>
+
+            <button type="button" class="btn btn-sm btn-outline" onclick="addPoint()" style="margin-top:8px">
+              + Agregar punto
+            </button>
+          </div>
+        </div>
+
+        <!-- SOURCE -->
+        <div class="admin-form-section" style="margin-bottom:24px">
+          <div class="admin-form-section-header">
+            <h3>📰 Fuente Original</h3>
+          </div>
+          <div class="admin-form-body">
+            <div class="form-group">
+              <label class="form-label">Nombre</label>
+              <input type="text" class="form-input" name="source_name"
+                     value="<%= news.source?.name || '' %>" readonly
+                     style="opacity:.6">
+            </div>
+            <div class="form-group">
+              <label class="form-label">URL</label>
+              <input type="text" class="form-input" name="source_url"
+                     value="<%= news.source?.url || '' %>" readonly
+                     style="opacity:.6;font-size:.78rem">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: PREVIEW -->
+      <div>
+        <div class="admin-preview">
+          <div class="admin-preview-header">
+            <h3>Vista previa</h3>
+            <div class="preview-tabs">
+              <button class="preview-tab active" onclick="switchPreview('ig', this)">📸 IG</button>
+              <button class="preview-tab" onclick="switchPreview('fb', this)">📘 FB</button>
+              <button class="preview-tab" onclick="switchPreview('carousel', this)">🖼️ Slides</button>
+            </div>
+          </div>
+
+          <!-- IG Preview -->
+          <div class="preview-body" id="preview-ig">
+            <div class="ig-preview">
+              <div class="ig-preview-header">
+                <div class="ig-avatar">AP</div>
+                <div>
+                  <div class="name">agro.parallel</div>
+                </div>
+              </div>
+              <div style="background:var(--admin-dark);height:280px;display:flex;align-items:center;justify-content:center">
+                <div style="text-align:center">
+                  <div style="font-size:.65rem;font-weight:900;letter-spacing:2px;color:var(--admin-green);background:var(--admin-black);display:inline-block;padding:3px 10px;border-radius:4px;margin-bottom:10px" id="prev-ig-cat"><%= news.web?.category %></div>
+                  <div style="font-size:.95rem;font-weight:900;color:#fff;padding:0 20px;line-height:1.2" id="prev-ig-title"><%= news.carousel?.title || news.web?.title %></div>
+                </div>
+              </div>
+              <div class="ig-preview-caption" id="prev-ig-caption"><%= news.instagram?.caption || '' %></div>
+              <div class="ig-preview-hashtags" id="prev-ig-hashtags"><%= news.instagram?.hashtags || '' %></div>
+            </div>
+          </div>
+
+          <!-- FB Preview -->
+          <div class="preview-body" id="preview-fb" style="display:none">
+            <div class="fb-preview">
+              <div style="padding:10px 14px;display:flex;align-items:center;gap:10px">
+                <div class="ig-avatar">AP</div>
+                <div>
+                  <div style="font-size:.82rem;font-weight:700">Agro Parallel</div>
+                  <div style="font-size:.68rem;color:var(--admin-muted)"><%= formatDate(news.publishedAt) %></div>
+                </div>
+              </div>
+              <div class="fb-preview-text" id="prev-fb-post"><%= news.facebook?.post || '' %></div>
+              <div class="fb-preview-link">
+                <strong id="prev-fb-link-title"><%= news.facebook?.link_title || '' %></strong>
+                <small id="prev-fb-link-desc"><%= news.facebook?.link_description || '' %></small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Carousel Preview -->
+          <div class="preview-body" id="preview-carousel" style="display:none">
+            <% if (carouselUrls && carouselUrls.length > 0) { %>
+            <div class="admin-carousel-viewer">
+              <img id="carouselPreviewImg" src="<%= carouselUrls[0] %>" alt="Slide 1"
+                   onerror="this.style.opacity='.3'">
+              <div class="carousel-nav-row">
+                <button class="carousel-nav-btn" onclick="prevCarousel()">←</button>
+                <span class="carousel-counter" id="carouselCounter">1 / <%= carouselUrls.length %></span>
+                <button class="carousel-nav-btn" onclick="nextCarousel()">→</button>
+              </div>
+            </div>
+            <% } else { %>
+            <div style="text-align:center;padding:40px 0;color:var(--admin-muted)">
+              <div style="font-size:2rem;margin-bottom:8px">🖼️</div>
+              <p style="font-size:.82rem">Sin slides generados aún</p>
+            </div>
+            <% } %>
+
+            <button class="btn btn-sm btn-outline" style="width:100%;margin-top:12px" onclick="regenerateCarousel()">
+              🔄 Regenerar carrusel
+            </button>
+          </div>
+        </div>
+
+        <!-- PUBLISH ACTIONS -->
+        <div class="admin-form-section" style="margin-top:20px">
+          <div class="admin-form-section-header">
+            <h3>🚀 Publicar</h3>
+          </div>
+          <div class="admin-form-body">
+            <button type="button" class="btn btn-green" style="width:100%;margin-bottom:10px;justify-content:center" onclick="publishTo('instagram')">
+              📸 Publicar en Instagram
+            </button>
+            <button type="button" class="btn btn-outline" style="width:100%;margin-bottom:10px;justify-content:center;border-color:#1877F2;color:#1877F2" onclick="publishTo('facebook')">
+              📘 Publicar en Facebook
+            </button>
+            <button type="button" class="btn btn-outline" style="width:100%;justify-content:center;opacity:.5;cursor:not-allowed" disabled>
+              🎵 TikTok (próximamente)
+            </button>
+          </div>
+        </div>
+
+        <!-- DANGER ZONE -->
+        <div class="admin-form-section" style="margin-top:20px;border-color:rgba(231,76,60,.2)">
+          <div class="admin-form-section-header" style="border-color:rgba(231,76,60,.15)">
+            <h3 style="color:var(--admin-red)">⚠️ Zona peligrosa</h3>
+          </div>
+          <div class="admin-form-body">
+            <button type="button" class="btn btn-danger" style="width:100%;justify-content:center"
+                    onclick="confirmDelete('<%= news._id %>')">
+              🗑️ Eliminar publicación
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    </form>
+
+  </main>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="admin-modal-overlay" id="deleteModal">
+  <div class="admin-modal">
+    <h3>🗑️ Eliminar publicación</h3>
+    <p>¿Estás seguro? Esta acción elimina la noticia del blog y CouchDB permanentemente.</p>
+    <div class="admin-modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('deleteModal')">Cancelar</button>
+      <button class="btn btn-danger" onclick="executeDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="admin-toast" id="toast"></div>
+
+<script>
+  const SLUG = '<%= news.slug %>';
+  const DOC_ID = '<%= news._id %>';
+  const carouselUrls = <%- JSON.stringify(carouselUrls || []) %>;
+  let carouselIdx = 0;
+
+  // ── Preview switching ──
+  function switchPreview(tab, btn) {
+    document.querySelectorAll('.preview-body').forEach(p => p.style.display = 'none');
+    document.getElementById('preview-' + tab).style.display = '';
+    document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ── Live preview update ──
+  function updatePreview() {
+    const f = document.getElementById('editForm');
+    // IG
+    document.getElementById('prev-ig-caption').textContent = f.ig_caption?.value || '';
+    document.getElementById('prev-ig-hashtags').textContent = f.ig_hashtags?.value || '';
+    document.getElementById('prev-ig-title').textContent = f.carousel_title?.value || f.web_title?.value || '';
+    document.getElementById('prev-ig-cat').textContent = f.web_category?.value || '';
+    // FB
+    document.getElementById('prev-fb-post').textContent = f.fb_post?.value || '';
+    document.getElementById('prev-fb-link-title').textContent = f.fb_link_title?.value || '';
+    document.getElementById('prev-fb-link-desc').textContent = f.fb_link_desc?.value || '';
+  }
+
+  // ── Tags ──
+  function addTag(e, input) {
+    if (e.key !== 'Enter' && e.key !== ',') return;
+    e.preventDefault();
+    const val = input.value.trim().replace(/[^a-záéíóúñ0-9]/gi, '');
+    if (!val) return;
+    const span = document.createElement('span');
+    span.className = 'form-tag';
+    span.dataset.tag = val;
+    span.innerHTML = '#' + val + ' <span class="remove-tag" onclick="removeTag(this)">✕</span>';
+    input.parentNode.insertBefore(span, input);
+    input.value = '';
+  }
+
+  function removeTag(el) { el.parentElement.remove(); }
+
+  function getTags() {
+    return [...document.querySelectorAll('.form-tag')].map(t => t.dataset.tag);
+  }
+
+  // ── Points ──
+  let pointCount = document.querySelectorAll('[data-point]').length;
+
+  function addPoint() {
+    if (pointCount >= 5) { showToast('Máximo 5 puntos', true); return; }
+    const container = document.getElementById('pointsContainer');
+    const idx = pointCount;
+    const html = `
+      <div class="form-group" data-point="${idx}" style="background:var(--admin-bg);border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid var(--admin-border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <span style="font-size:.88rem;font-weight:900;color:var(--admin-green)">PUNTO 0${idx+1}</span>
+          <button type="button" class="btn-icon danger" onclick="removePoint(this)" title="Eliminar punto">✕</button>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label class="form-label">Headline</label>
+          <input type="text" class="form-input" name="point_headline_${idx}" maxlength="45" placeholder="Punto clave...">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Descripción</label>
+          <input type="text" class="form-input" name="point_desc_${idx}" maxlength="110" placeholder="Explicación...">
+        </div>
+      </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    pointCount++;
+  }
+
+  function removePoint(btn) {
+    btn.closest('[data-point]').remove();
+    // Renumber
+    document.querySelectorAll('[data-point]').forEach((el, i) => {
+      el.dataset.point = i;
+      el.querySelector('span[style*="color:var(--admin-green)"]').textContent = 'PUNTO 0' + (i+1);
+    });
+    pointCount = document.querySelectorAll('[data-point]').length;
+  }
+
+  function getPoints() {
+    const points = [];
+    document.querySelectorAll('[data-point]').forEach(el => {
+      const idx = el.dataset.point;
+      const headline = el.querySelector('[name^="point_headline"]')?.value || '';
+      const desc = el.querySelector('[name^="point_desc"]')?.value || '';
+      if (headline || desc) points.push({ headline, description: desc });
+    });
+    return points;
+  }
+
+  // ── Carousel nav ──
+  function nextCarousel() {
+    if (!carouselUrls.length) return;
+    carouselIdx = (carouselIdx + 1) % carouselUrls.length;
+    updateCarousel();
+  }
+  function prevCarousel() {
+    if (!carouselUrls.length) return;
+    carouselIdx = (carouselIdx - 1 + carouselUrls.length) % carouselUrls.length;
+    updateCarousel();
+  }
+  function updateCarousel() {
+    const img = document.getElementById('carouselPreviewImg');
+    const ctr = document.getElementById('carouselCounter');
+    if (img) img.src = carouselUrls[carouselIdx];
+    if (ctr) ctr.textContent = (carouselIdx+1) + ' / ' + carouselUrls.length;
+  }
+
+  // ── Save ──
+  async function saveChanges() {
+    const f = document.getElementById('editForm');
+    const body = {
+      web: {
+        title:    f.web_title.value,
+        summary:  f.web_summary.value,
+        category: f.web_category.value,
+        tags:     getTags(),
+      },
+      instagram: {
+        caption:  f.ig_caption.value,
+        hashtags: f.ig_hashtags.value,
+      },
+      facebook: {
+        post:             f.fb_post.value,
+        link_title:       f.fb_link_title.value,
+        link_description: f.fb_link_desc.value,
+      },
+      carousel: {
+        title:    f.carousel_title.value,
+        category: f.web_category.value,
+        points:   getPoints(),
+      },
+    };
+
+    try {
+      const res = await fetch('/api/admin/news/' + DOC_ID, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('✅ Cambios guardados');
+      } else {
+        showToast('Error: ' + (data.error || 'desconocido'), true);
+      }
+    } catch (e) {
+      showToast('Error de conexión', true);
+    }
+  }
+
+  function resetForm() {
+    if (confirm('¿Deshacer todos los cambios?')) location.reload();
+  }
+
+  // ── Publish ──
+  async function publishTo(platform) {
+    showToast('Publicando en ' + platform + '...');
+    try {
+      const res = await fetch('/api/admin/publish/' + DOC_ID, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('✅ Publicado en ' + platform);
+      } else {
+        showToast('Error: ' + (data.error || 'no implementado'), true);
+      }
+    } catch (e) {
+      showToast('Error de conexión', true);
+    }
+  }
+
+  // ── Regenerate carousel ──
+  async function regenerateCarousel() {
+    showToast('Regenerando carrusel...');
+    try {
+      const res = await fetch('/api/admin/regenerate-carousel/' + DOC_ID, { method: 'POST' });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('✅ Carrusel regenerado');
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        showToast('Error: ' + (data.error || 'desconocido'), true);
+      }
+    } catch (e) {
+      showToast('Error de conexión', true);
+    }
+  }
+
+  // ── Delete ──
+  function confirmDelete(id) {
+    document.getElementById('deleteModal').classList.add('open');
+  }
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+  async function executeDelete() {
+    try {
+      const res = await fetch('/api/admin/news/' + DOC_ID, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.ok) {
+        showToast('Eliminada');
+        setTimeout(() => window.location.href = '/admin', 1000);
+      } else {
+        showToast('Error', true);
+      }
+    } catch (e) {
+      showToast('Error', true);
+    }
+    closeModal('deleteModal');
+  }
+
+  // ── Toast ──
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'admin-toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.className = 'admin-toast', 3000);
+  }
+
+  // Smooth scroll to sections
+  document.querySelectorAll('.admin-nav-item[href^="#"]').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
