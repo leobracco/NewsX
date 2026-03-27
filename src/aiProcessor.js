@@ -6,28 +6,33 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 async function filterAndRankNews(articles) {
   if (!articles.length) return [];
 
-  const summary = articles.slice(0, 20)
+  const summary = articles
+    .slice(0, 20)
     .map((a, i) => `[${i}] TÍTULO: ${a.title} | DESC: ${a.description}`)
     .join("\n");
 
   const res = await client.messages.create({
     model: "claude-opus-4-5",
     max_tokens: 500,
-    messages: [{
-      role: "user",
-      content: `Experto en agricultura argentina. Seleccioná las 3 noticias más relevantes para productores, agrónomos e inversores del campo argentino.
+    messages: [
+      {
+        role: "user",
+        content: `Experto en agricultura argentina. Seleccioná las 3 noticias más relevantes para productores, agrónomos e inversores del campo argentino.
 Criterios: tecnología agro, soja/maíz/trigo/ganadería, maquinaria, precision farming, commodities, biotecnología, sostenibilidad.
 
 NOTICIAS:
 ${summary}
 
 Respondé SOLO con JSON: {"selected": [0, 2, 5]}`,
-    }],
+      },
+    ],
   });
 
   try {
-    const parsed = JSON.parse(res.content[0].text.replace(/```json|```/g, "").trim());
-    return (parsed.selected || []).map(i => articles[i]).filter(Boolean);
+    const parsed = JSON.parse(
+      res.content[0].text.replace(/```json|```/g, "").trim(),
+    );
+    return (parsed.selected || []).map((i) => articles[i]).filter(Boolean);
   } catch {
     return articles.slice(0, 3);
   }
@@ -35,11 +40,12 @@ Respondé SOLO con JSON: {"selected": [0, 2, 5]}`,
 
 async function generateContent(article) {
   const res = await client.messages.create({
-    model: "claude-opus-4-5",
+    model: "claude-sonnet-4",
     max_tokens: 3000,
-    messages: [{
-      role: "user",
-      content: `Sos el community manager de "Agro Parallel" (@agro.parallel), medio digital de noticias agro argentino.
+    messages: [
+      {
+        role: "user",
+        content: `Sos el community manager de "Agro Parallel" (@agro.parallel), medio digital de noticias agro argentino.
 Adaptá esta noticia internacional para el campo argentino.
 
 NOTICIA:
@@ -75,12 +81,17 @@ Respondé SOLO con JSON válido:
 }
 
 IMPORTANTE: carousel.points entre 2 y 5 según riqueza de la noticia.`,
-    }],
+      },
+    ],
   });
 
   try {
     const clean = res.content[0].text.replace(/```json|```/g, "").trim();
-    return { original: article, generated: JSON.parse(clean), processedAt: new Date().toISOString() };
+    return {
+      original: article,
+      generated: JSON.parse(clean),
+      processedAt: new Date().toISOString(),
+    };
   } catch (e) {
     console.error("Error generando contenido:", article.title);
     return null;
@@ -97,7 +108,7 @@ async function processNewsWithAI(articles) {
     console.log(`✍️  Procesando: ${article.title}`);
     const content = await generateContent(article);
     if (content) processed.push(content);
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise((r) => setTimeout(r, 1000));
   }
   return processed;
 }
