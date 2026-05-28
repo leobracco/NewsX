@@ -5,8 +5,10 @@
   "scripts": {
     "start": "node src/scheduler.js",
     "web": "node web/server.js",
+    "listener": "node src/changes-listener.js",
     "dev-bot": "nodemon src/scheduler.js",
     "dev-web": "nodemon web/server.js",
+    "dev-listener": "nodemon src/changes-listener.js",
     "test": "node src/scheduler.js --run-now",
     "report": "node src/scheduler.js --report"
   },

@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express     = require("express");
 const session     = require("express-session");
+const FileStore   = require("./fileStore")(session);
 const axios       = require("axios");
 const path        = require("path");
 const fs          = require("fs");
@@ -26,6 +27,7 @@ const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || "";
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
+  store: new FileStore({ path: path.join(__dirname, "../data/sessions") }),
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,

@@ -2,20 +2,16 @@ require("dotenv").config();
 const axios = require("axios");
 const fs    = require("fs");
 const FormData = require("form-data");
+const log = require("../logger");
 
-const GRAPH_URL  = "https://graph.facebook.com/v19.0";
+const GRAPH_URL  = "https://graph.facebook.com/v21.0";
 const PAGE_ID    = process.env.FACEBOOK_PAGE_ID;
 const PAGE_TOKEN = process.env.FACEBOOK_PAGE_ACCESS_TOKEN;
 
 // ─── PUBLICAR CARRUSEL EN FACEBOOK ───────────────────────────────────
-/**
- * Publica un carrusel en Facebook como álbum de fotos con texto
- * Facebook no soporta carrusel nativo vía API para páginas,
- * se publican como fotos múltiples en un post.
- */
 async function publishCarouselToFacebook(newsItem, imagePaths) {
   if (!PAGE_ID || !PAGE_TOKEN) {
-    console.log("  ⚠️  Facebook: credenciales no configuradas, saltando");
+    log.warn("Facebook: credenciales no configuradas, saltando");
     return null;
   }
 
@@ -23,8 +19,8 @@ async function publishCarouselToFacebook(newsItem, imagePaths) {
     const { generated } = newsItem;
     const fbPost = generated.facebook;
 
-    // 1. Subir cada imagen y obtener photo_id (sin publicar)
-    console.log(`  📤 Facebook: subiendo ${imagePaths.length} imágenes...`);
+    // 1. Subir cada imagen sin publicar
+    log.info(`  FB: subiendo ${imagePaths.length} imagenes...`);
     const photoIds = [];
 
     for (const imgPath of imagePaths) {
@@ -32,9 +28,9 @@ async function publishCarouselToFacebook(newsItem, imagePaths) {
       if (photoId) photoIds.push(photoId);
     }
 
-    if (!photoIds.length) throw new Error("No se pudieron subir imágenes");
+    if (!photoIds.length) throw new Error("No se pudieron subir imagenes");
 
-    // 2. Crear post con todas las fotos adjuntas
+    // 2. Crear post con todas las fotos
     const postBody = {
       message:     fbPost.post,
       attached_media: photoIds.map(id => ({ media_fbid: id })),
@@ -43,11 +39,41 @@ async function publishCarouselToFacebook(newsItem, imagePaths) {
 
     const res = await axios.post(`${GRAPH_URL}/${PAGE_ID}/feed`, postBody);
 
-    console.log(`  ✅ Facebook: publicado [${res.data.id}]`);
+    log.info(`  FB: publicado [${res.data.id}]`);
     return { platform: "facebook", postId: res.data.id, url: `https://facebook.com/${res.data.id}` };
 
   } catch (e) {
-    console.error("  ❌ Facebook error:", e.response?.data?.error?.message || e.message);
+    log.error(`  FB error: ${e.response?.data?.error?.message || e.message}`);
+    return null;
+  }
+}
+
+// ─── PUBLICAR STORY EN FACEBOOK ─────────────────────────────────────
+async function publishStoryToFacebook(newsItem, storyImagePath) {
+  if (!PAGE_ID || !PAGE_TOKEN) {
+    log.warn("FB Story: credenciales no configuradas, saltando");
+    return null;
+  }
+
+  try {
+    // 1. Subir la imagen sin publicar
+    log.info("  FB Story: subiendo imagen...");
+    const photoId = await uploadPhotoUnpublished(storyImagePath);
+    if (!photoId) throw new Error("No se pudo subir imagen para story");
+
+    // 2. Publicar como story de la pagina
+    const res = await axios.post(`${GRAPH_URL}/${PAGE_ID}/photo_stories`, {
+      photo_id: photoId,
+      access_token: PAGE_TOKEN,
+    });
+
+    log.info(`  FB Story: publicado [${res.data.post_id || res.data.id}]`);
+    return {
+      platform: "facebook_story",
+      postId: res.data.post_id || res.data.id,
+    };
+  } catch (e) {
+    log.error(`  FB Story error: ${e.response?.data?.error?.message || e.message}`);
     return null;
   }
 }
@@ -64,32 +90,9 @@ async function uploadPhotoUnpublished(imagePath) {
     });
     return res.data.id;
   } catch (e) {
-    console.error("  ❌ Error subiendo foto:", e.response?.data?.error?.message || e.message);
+    log.error(`  Error subiendo foto: ${e.response?.data?.error?.message || e.message}`);
     return null;
   }
 }
 
-// ─── PUBLICAR POST SIMPLE (sin carrusel) ─────────────────────────────
-async function publishPostToFacebook(newsItem, imageUrl = null) {
-  if (!PAGE_ID || !PAGE_TOKEN) return null;
-
-  try {
-    const { generated, original } = newsItem;
-    const body = {
-      message:      generated.facebook.post,
-      link:         original.url,
-      access_token: PAGE_TOKEN,
-    };
-
-    if (imageUrl) body.picture = imageUrl;
-
-    const res = await axios.post(`${GRAPH_URL}/${PAGE_ID}/feed`, body);
-    console.log(`  ✅ Facebook post simple: [${res.data.id}]`);
-    return { platform: "facebook", postId: res.data.id };
-  } catch (e) {
-    console.error("  ❌ Facebook error:", e.response?.data?.error?.message || e.message);
-    return null;
-  }
-}
-
-module.exports = { publishCarouselToFacebook, publishPostToFacebook };
+module.exports = { publishCarouselToFacebook, publishStoryToFacebook };

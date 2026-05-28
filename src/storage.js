@@ -82,8 +82,9 @@ async function getDailyReport() {
 
 async function getPublishedUrls() {
   const queue = await loadQueue();
+  // Incluir todos los procesados (pending, published) para no repetir
   return new Set(
-    queue.filter((i) => i.status === "published").map((i) => i.original.url),
+    queue.filter((i) => i.status !== "failed").map((i) => i.original?.url).filter(Boolean),
   );
 }
 

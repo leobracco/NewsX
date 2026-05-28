@@ -1,5 +1,6 @@
 require("dotenv").config();
 const axios = require("axios");
+const log = require("./logger");
 
 const NEWSAPI_KEY = process.env.NEWSAPI_KEY;
 
@@ -23,15 +24,15 @@ async function fetchNewsFromAPI(query) {
         q: query,
         sortBy: "publishedAt",
         pageSize: 10,
-        language: "es", // primero en español
+        language: "es",
         apiKey: NEWSAPI_KEY,
       },
-      timeout: 10000,
+      timeout: 20000,
     });
 
     let articles = response.data.articles || [];
 
-    // Si no trajo nada en español, buscar en inglés
+    // Si no trajo nada en espanol, buscar en ingles
     if (articles.length === 0) {
       const en = await axios.get("https://newsapi.org/v2/everything", {
         params: {
@@ -40,49 +41,55 @@ async function fetchNewsFromAPI(query) {
           pageSize: 10,
           apiKey: NEWSAPI_KEY,
         },
-        timeout: 10000,
+        timeout: 20000,
       });
       articles = en.data.articles || [];
     }
 
     return articles;
   } catch (error) {
-    console.error(
-      `Error fetching "${query}":`,
-      error.response?.data?.message || error.message,
-    );
+    const msg = error.response?.data?.message || error.message;
+    log.warn(`Fetch "${query}" fallo: ${msg}`);
     return [];
   }
 }
 
 async function fetchAllNews(processedUrls = new Set()) {
-  console.log("🌾 Buscando noticias agro...");
+  log.info("Buscando noticias agro...");
 
-  // Usar más queries y no filtrar por fecha (plan gratis no lo soporta)
+  if (!NEWSAPI_KEY) {
+    log.error("NEWSAPI_KEY no configurada");
+    return [];
+  }
+
   const selectedQueries = shuffleArray(SEARCH_QUERIES).slice(0, 5);
-  console.log("   Queries:", selectedQueries.join(" | "));
+  log.info(`Queries: ${selectedQueries.join(" | ")}`);
 
   const results = await Promise.allSettled(
     selectedQueries.map(fetchNewsFromAPI),
   );
 
   let all = [];
+  let failed = 0;
   results.forEach((r) => {
     if (r.status === "fulfilled") all = all.concat(r.value);
-    if (r.status === "rejected") console.error("Query falló:", r.reason);
+    if (r.status === "rejected") {
+      failed++;
+      log.warn(`Query fallo: ${r.reason?.message || r.reason}`);
+    }
   });
 
-  console.log(`   Raw articles: ${all.length}`);
+  if (failed === results.length) {
+    log.error("TODAS las queries fallaron - posible problema con NewsAPI");
+  }
+
+  log.info(`Raw articles: ${all.length}`);
   const unique = deduplicateByUrl(all, processedUrls);
 
-  console.log(`✅ ${unique.length} artículos únicos válidos`);
-
-  // Mostrar títulos para debug
-  unique
-    .slice(0, 5)
-    .forEach((a, i) =>
-      console.log(`   [${i + 1}] ${a.title?.substring(0, 80)}`),
-    );
+  log.info(`${unique.length} articulos unicos validos`);
+  unique.slice(0, 5).forEach((a, i) =>
+    log.info(`  [${i + 1}] ${a.title?.substring(0, 80)}`),
+  );
 
   return unique;
 }
@@ -91,6 +98,7 @@ function deduplicateByUrl(articles, processedUrls = new Set()) {
   const seen = new Set(processedUrls);
   return articles.filter((a) => {
     if (!a.url || seen.has(a.url)) return false;
+    if (a.title === "[Removed]") return false;
     seen.add(a.url);
     return true;
   });
